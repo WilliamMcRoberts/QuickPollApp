@@ -1,68 +1,74 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.AspNetCore.Rewrite;
-using Microsoft.Identity.Web;
-using Microsoft.Identity.Web.UI;
-using QuickPollUI.Data;
 
-var builder = WebApplication.CreateBuilder(args);
+var configuration = new ConfigurationBuilder()
+    .AddJsonFile("appsettings.json")
+    .AddJsonFile("appsettings.Development.json")
+    .Build();
 
-// Add services to the container.
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAdB2C"));
-builder.Services.AddControllersWithViews()
-    .AddMicrosoftIdentityUI();
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration)
+    .CreateLogger();
 
-builder.Services.AddAuthorization(options =>
+try
 {
-    options.AddPolicy("Admin", policy =>
+    Log.Information("Application Starting...");
+
+    var builder = WebApplication.CreateBuilder(args);
+
+    builder.ConfigureServices();
+
+
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    if (!app.Environment.IsDevelopment())
     {
-        policy.RequireClaim("JobTitle", "Admin");
-    });
-});
+        app.UseExceptionHandler("/Error");
+        // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+        app.UseHsts();
+    }
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor()
-    .AddMicrosoftIdentityConsentHandler();
-builder.Services.AddSingleton<WeatherForecastService>();
+    app.UseHttpsRedirection();
 
-var app = builder.Build();
+    app.UseStaticFiles();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+    app.UseRouting();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    // Redirect
+    app.UseRewriter(
+        new RewriteOptions().Add(
+                context =>
+                {
+                    if (context.HttpContext.Request.Path == "/MicrosoftIdentity/Account/SignedOut")
+                    {
+                        context.HttpContext.Response.Redirect("/");
+                    }
+                }
+            ));
+
+    app.MapControllers();
+    app.MapBlazorHub();
+
+    /*********************** Hubs ***************************************/
+    app.MapHub<ChatHub>("/chathub");
+    app.MapHub<PollHub>("/pollhub");
+    /********************** End Hubs ************************************/
+
+    app.MapFallbackToPage("/_Host");
+
+    app.Run();
+}
+catch (Exception ex)
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    string type = ex.GetType().Name;
+    if (type.Equals("StopTheHostException", StringComparison.OrdinalIgnoreCase)) throw;
+    Log.Fatal(ex, "The Host Stopped Unexpectedly...");
+}
+finally
+{
+    Log.CloseAndFlush();
 }
 
-app.UseHttpsRedirection();
 
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-// Redirect
-app.UseRewriter(
-    new RewriteOptions().Add(
-            context =>
-            {
-                if (context.HttpContext.Request.Path == "/MicrosoftIdentity/Account/SignedOut")
-                {
-                    context.HttpContext.Response.Redirect("/");
-                }
-            }
-        ));
-
-app.MapControllers();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-
-app.Run();

@@ -1,0 +1,106 @@
+﻿
+
+<button type="@Type" @onclick="OnClick" class="@ClassType custom-btn" disabled="@Disabled">
+    @ChildContent
+</button>
+
+@code {
+    [Parameter]
+    public string ClassType { get; set; } = "primary";
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } = "button";
+
+    [Parameter]
+    public EventCallback HandleClick { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> HandleClickWithMouseArgs { get; set; }
+
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    [Parameter]
+    public bool UseMouseEventArgs { get; set; }
+
+    public async void OnClick()
+    {
+        if (UseMouseEventArgs)
+        {
+            await HandleClickWithMouseArgs.InvokeAsync();
+            return;
+        }
+        await HandleClick.InvokeAsync();
+    }
+}
+
+<style>
+
+    .secondary {
+        border: 0;
+        background: #45c496;
+        color: #fff;
+        text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);
+        box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);
+    }
+
+        .secondary:hover {
+            background: #fff;
+            color: #45c496;
+            border: 2px solid #45c496;
+        }
+
+    .add-option {
+        position: absolute;
+        right: 21%;
+        font-weight: 700;
+        border-radius: 6px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+        border: 1px solid #000;
+        margin: .25em auto;
+    }
+
+        .add-option:hover {
+            background: #aaa;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0, 0.1);
+        }
+
+    .remove {
+        border: none;
+        background: none;
+        color: #d91b42;
+        font-size: .75em;
+        position: relative;
+        right: 40%;
+        margin-top: .5em;
+    }
+
+    .remove:hover {
+        color: #c5b9b9f7;
+    }
+
+    .custom-btn {
+        cursor: pointer;
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-weight: 700;
+    }
+
+    .primary {
+        border: 0;
+        background: #d91b42;
+        color: #fff;
+        text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);
+        box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .primary:hover {
+        background: #fff;
+        color: #c5b9b9f7;
+        border: 2px solid #c5b9b9f7;
+    }
+
+</style>

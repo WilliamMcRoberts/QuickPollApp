@@ -1,0 +1,21 @@
+﻿@page "/polls/{pollId}"
+@inject IPollService _pollService
+
+<h3>@poll.Question</h3>
+@foreach(var option in poll.OptionsList)
+{
+    <div>
+        <p>@option.PollOptionName</p>
+        <p>@option.PollOptionVotes</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string PollId { get; set; }
+    private PollModel poll;
+    protected override void OnInitialized()
+    {
+        poll = _pollService.AllPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault();
+    }
+}

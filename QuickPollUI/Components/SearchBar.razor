@@ -1,0 +1,61 @@
+﻿
+<div class="search-bar-container">
+    <input type="text" @bind-value="@searchText" @oninput="@(e => OnSearchInput(e))" placeholder="🔍 Search"/>
+</div>
+
+@code {
+
+    string searchText = string.Empty;
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<List<PollModel>> HandleSearchInput { get; set; }
+
+    [Parameter]
+    public List<PollModel> AllPolls { get; set; }
+
+    private async Task OnSearchInput(ChangeEventArgs e)
+    {
+        searchText = e.Value.ToString();
+
+        if (string.IsNullOrWhiteSpace(searchText))
+        {
+            await HandleSearchInput.InvokeAsync(AllPolls);
+            return;
+        }
+
+        var output = AllPolls.Where(p => p.Question.Contains(searchText,
+            StringComparison.InvariantCultureIgnoreCase) ||
+            p.PollId.ToString().Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
+            .ToList();
+
+        await HandleSearchInput.InvokeAsync(output);
+    }
+}
+
+<style>
+    input {
+        letter-spacing: 2px;
+        text-align:center;
+        border-radius: 50px;
+        border: transparent;
+        padding: 5px;
+        font-weight: 700;
+        box-shadow: 2px 4px 10px  rgba(0, 0, 0, 0.8);
+        color: #BF40BF;
+    }
+
+    input:focus {
+        outline-style: none;
+    }
+
+    .search-bar-container {
+        margin: 3em auto;
+        position: absolute;
+        right: 12.5%;
+        top: 7.5%;
+    }
+
+</style>

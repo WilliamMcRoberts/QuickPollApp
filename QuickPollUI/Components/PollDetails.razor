@@ -1,0 +1,152 @@
+﻿@inject IPollService _pollService
+
+<Card>
+    <div class="poll">
+        <h3>@Poll.Question</h3>
+        <p>Total Votes: @GetTotalVotes(Poll.OptionsList)</p>
+        @foreach(var option in Poll.OptionsList)
+        {
+            <div @onclick="(() => VoteForOption(Poll, option))" class="answer">
+                <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%"></div>
+                <span class="percent-block">
+                    <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
+                    <div style="color: @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%</div> 
+                </span>
+            </div>
+        }
+    </div>
+    <div class="delete">
+        <Button 
+            Disabled="@(Poll.PollCreatorId != LoggedInUser?.UserId)" 
+            HandleClick="(() => DeletePoll(Poll))">Delete
+        </Button>
+    </div>
+    @if(!Poll.IsComplete)
+    {
+        <CountDownTimer />
+    }
+    else
+    {
+        <div class="timer">
+            <p class="finished">Poll Finished</p>
+        </div>
+    }
+</Card>
+
+@code {
+    [CascadingParameter]
+    public PollModel Poll { get; set; }
+
+    [CascadingParameter]
+    public UserModel LoggedInUser { get; set; }
+
+    private decimal GetPercentage(int votes, int totalVotes)
+    {
+        if (totalVotes == 0) return 0;
+        return Math.Round((100 / (decimal)totalVotes * votes), 2);
+    }
+
+    private int GetTotalVotes(List<PollOptionModel> pollOptions)
+    {
+        int total = 0;
+
+        foreach (var option in pollOptions)
+        {
+            total += option.PollOptionVotes;
+        }
+
+        return total;
+    }
+
+    private async Task VoteForOption(PollModel poll, PollOptionModel pollOption)
+    {
+        if (poll.UsersVoted.Contains(LoggedInUser.UserId)) return;
+        if (poll.PollCreatorId == LoggedInUser.UserId) return;
+        if (poll.IsComplete) return;
+        if (!poll.HasStarted) return;
+
+        poll.UsersVoted.Add(LoggedInUser.UserId);
+
+        await _pollService.Vote(poll.PollId, pollOption);
+    }
+
+    public void DeletePoll(PollModel poll)
+    {
+        if (poll.PollCreatorId != LoggedInUser.UserId) return;
+        if (DateTime.Now < poll.StartTime + poll.TimeLimit) return;
+        _pollService.RemovePoll(poll.PollId);
+    }
+}
+
+<style>
+
+    .finished {
+        position: absolute;
+        bottom: 0;
+        right: 30px;
+    }
+
+    .option-votes {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .percent-block {
+        display: flex;
+        justify-content:space-between;
+    }
+
+    .poll {
+        margin-bottom: 3em;
+    }
+
+    .delete {
+        text-align: center;
+        position: absolute;
+        bottom: 10px;
+    }
+
+    .percent-even {
+        background: rgba(217, 27, 66, 0.3);
+        border-left: 4px solid #d91b42;
+    }
+
+    .percent-odd {
+        background: rgba(69, 196, 150, 0.3);
+        border-left: 4px solid #45c496;
+    }
+
+    .percent {
+        height: 100%;
+        position: absolute;
+        box-sizing: border-box;
+        transition: .25s ease;
+    }
+
+    h3 {
+        margin: 0 auto;
+        color: #555;
+    }
+
+    p {
+        font-size: 14px;
+        color: #aaa;
+    }
+
+    .answer {
+        background: #fafafa;
+        cursor: pointer;
+        margin: .25em auto;
+        position: relative;
+    }
+
+    .answer:hover {
+        opacity: 0.6;
+    }
+
+    span {
+        display: inline-block;
+        padding: 10px 20px;
+    }
+
+</style>

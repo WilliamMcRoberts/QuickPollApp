@@ -1,0 +1,101 @@
+﻿
+<CascadingValue Value="this">
+    <div class="child-content-box">
+        @ChildContent
+    </div>
+    <div class="Modal" id="Modal" style="@("display:" + ( showModal ? $"block; {modalPosition}" : "none;"))">
+        <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-between">
+                <label class="fw-bold">I have copied and saved my link</label>
+                <input class="checkbox-modal" type="checkbox" @bind="@copyConfirmation" />
+            </div>
+
+        </div>
+        <button class="close-modal-button" @onclick="CloseModal"> ❌ </button>
+
+        <DynamicComponent Type="ComponentType" Parameters="ComponentParameters" />
+    </div>
+</CascadingValue>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public delegate void modalClosed();
+    public event modalClosed OnModalClosed;
+
+    private bool showModal;
+    private string modalPosition;
+    private Type ComponentType = typeof(TempComponent);
+    private Dictionary<string, object> ComponentParameters;
+    private bool copyConfirmation;
+
+    public void ShowModal(
+        MouseEventArgs mouseEventArgs, Type componentType, Dictionary<string, object> componentParameters)
+    {
+        modalPosition = $"position: fixed; left: 50%; top: 50% ; transform: translate(-50%,-50%);";
+        ComponentType = componentType;
+        ComponentParameters = componentParameters;
+        showModal = true;
+        StateHasChanged();
+    }
+
+    public void CloseModal()
+    {
+        if (!copyConfirmation) return;
+
+        showModal = false;
+        copyConfirmation = false;
+        OnModalClosed();
+        StateHasChanged();
+    }
+}
+
+<style>
+
+    .checkbox-modal {
+        margin: 0 1.25em;
+        accent-color: #BF40BF;
+        transform: scale(2);
+    }
+
+    .Modal {
+        background: rgba(0,0, 0, 0.4);
+        backdrop-filter: blur(10px);
+        border: 3px solid #BF40BF;
+        width: 40%;
+        padding: 1em;
+        border-radius: 6px;
+        box-shadow: inset 0 0 7.5px 3px rgba(0,0, 0, 0.8);
+    }
+
+    .child-content-box {
+        backdrop-filter: @(showModal ? "blur(10px)" : "none");
+        background-color: @(showModal ? "rgba(0,0,0)" : "transparent");
+        opacity: @(showModal ? "0.2" : "1");
+    }
+
+    @@media(max-width: 680px) {
+        .Modal {
+            width: 60%;
+        }
+    }
+
+    .close-modal-button {
+        position: absolute;
+        margin: 0 auto;
+        color: #000;
+        background: none;
+        bottom: .5em;
+        right: .5em;
+        border: none;
+        font-size: 25px;
+        font-weight: 900;
+        text-shadow: 0 0 2.5px white, 0 0 5px white, 0 0 7.5px white;
+    }
+
+        .close-modal-button:hover {
+            text-shadow: 0 0 2.5px #BF40BF, 0 0 5px #BF40BF, 0 0 7.5px #BF40BF, 0 0 10px #BF40BF, 0 0 20px #BF40BF, 0 0 40px #BF40BF;
+        }
+
+</style>

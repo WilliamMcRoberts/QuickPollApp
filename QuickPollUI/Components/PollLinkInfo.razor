@@ -1,0 +1,76 @@
+﻿@inject IJSRuntime _js
+
+<div class="link-container">
+        <a class="link" @onclick="CopyLink"> Click Here To Copy Your Poll Link </a>
+    <div class="nice-container" style="display: @(Copied ? "block" : "none")">
+        <span class="nice">👌</span>
+        <span class="nice-text">Link Copied</span> 
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public PollModel CreatedPoll { get; set; }
+
+    [Parameter]
+    public bool Copied { get; set; }
+
+    string link = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        var id = CreatedPoll?.PollId;
+        link = $"https://localhost:7176/polls/{id.ToString()}";
+    }
+
+    public async Task CopyLink()
+    {
+        Copied = await _js.InvokeAsync<bool>("clipboardCopy", link);
+    }
+}
+
+<style>
+
+    .nice-text {
+        color: #BF40BF;
+        font-weight: 700;
+        text-shadow: 0 0 2.5px #000, 0 0 5px #000, 0 0 7.5px #000, 0 0 10px #000;
+    }
+
+    .nice {
+      font-size: 1.75em;
+      text-shadow: 0 0 2.5px #BF40BF, 0 0 5px #BF40BF, 0 0 7.5px #BF40BF, 0 0 10px #BF40BF, 0 0 20px #BF40BF, 0 0 40px #000;
+    }
+
+    .nice-container {
+        display: flex;
+        justify-content: center;
+
+       position: absolute;
+    }
+
+    .link {
+        cursor: pointer;
+        text-decoration: none;
+        background-image: linear-gradient(90deg, #BF40BF, #fff);
+        font-weight: 900;
+        background-size: 0% 5px;
+        background-repeat: no-repeat;
+        background-position: left bottom;
+        color: #BF40BF;
+        transition: 300ms ease;
+        text-shadow: 0 0 2.5px #000, 0 0 5px #000, 0 0 7.5px #000, 0 0 10px #000;
+    }
+
+    .link:hover {
+        background-size: 100% 5px;
+            color: #BF40BF;
+    }
+
+    .link-container {
+        text-align: center;
+        margin: 0 auto;
+        padding-bottom: 2em;
+    }
+
+</style>

@@ -1,0 +1,25 @@
+﻿@inject NavigationManager _nav
+
+<div class="poll-list">
+
+    @foreach (var poll in PollsToDisplay)
+    {
+        <CascadingValue Value="poll">
+            <PollDetails  />
+        </CascadingValue>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public List<PollModel> PollsToDisplay { get; set; } = new();
+}
+
+<style>
+    .poll-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+</style>

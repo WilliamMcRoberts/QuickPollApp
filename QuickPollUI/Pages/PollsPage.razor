@@ -1,0 +1,111 @@
+﻿@page "/polls"
+@inject NavigationManager _nav
+@inject IPollService _pollService
+@inject IMongoUserData _userData
+
+<CascadingValue Value="@loggedInUser">
+
+    <Tabs ActiveItem="@activeTab" Items="tabs" HandleTabChange="@HandleTabChange" />
+
+
+    @if(activeTab == "All Polls")
+    {
+        <SearchBar AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
+
+        <PollList PollsToDisplay="_pollsToDisplay" />
+    }
+    else if(activeTab == "Create Poll")
+    {
+        <CreatePollForm HandleAdd="@HandleAdd" />
+    }
+
+</CascadingValue>
+
+@code {
+    HubConnection pollHubConnection;
+
+    private List<PollModel> _allPolls = new();
+    private List<PollModel> _pollsToDisplay = new();
+    private List<PollModel> _finishedPolls = new();
+
+    private string[] tabs = new string[] { "All Polls", "Create Poll" };
+    private string activeTab = "All Polls";
+
+    private UserModel loggedInUser;
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateTask;
+        string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
+        loggedInUser = await _userData.GetCurrentUserFromAuthentication(objectId) ?? new();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            pollHubConnection = new HubConnectionBuilder()
+                        .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
+                        .WithAutomaticReconnect()
+                        .Build();
+
+            pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
+            {
+                _allPolls = allPolls;
+                _pollsToDisplay = _allPolls;
+                InvokeAsync(StateHasChanged);
+            });
+
+            //pollHubConnection.On<DateTime, List<PollModel>>("getActivePolls", (time, activePolls) =>
+            //{
+            //    var timeUpdated = time;
+            //    _activePolls = activePolls;
+            //    InvokeAsync(StateHasChanged);
+            //});
+
+            //pollHubConnection.On<DateTime, List<PollModel>>("getFinishedPolls", (time, finishedPolls) =>
+            //{
+            //    var timeUpdated = time;
+            //    _finishedPolls = finishedPolls;
+            //    InvokeAsync(StateHasChanged);
+            //});
+
+            pollHubConnection.On<Guid, PollModel>("getPoll", (pollId, poll) =>
+            {
+                var pollToUpdate = _allPolls.Where(p => p.PollId == pollId).FirstOrDefault();
+                if (pollToUpdate is not null)
+                {
+                    int index = _allPolls.IndexOf(pollToUpdate);
+                    _allPolls[index] = poll;
+                }
+                InvokeAsync(StateHasChanged);
+            });
+
+            await pollHubConnection.StartAsync();
+            await _pollService.BroadcastAllPolls();
+        }
+    }
+
+    public void HandleSearchInput(List<PollModel> filteredPolls)
+    {
+        _pollsToDisplay = filteredPolls;
+        //StateHasChanged();
+    }
+
+    public void HandleTabChange(string tab)
+    {
+        activeTab = tab;
+    }
+
+    public void HandleAdd()
+    {
+        activeTab = "All Polls";
+    }
+}
+
+<style>
+   
+</style>
