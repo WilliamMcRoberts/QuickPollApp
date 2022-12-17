@@ -7,16 +7,15 @@
 
     <Tabs ActiveItem="@activeTab" Items="tabs" HandleTabChange="@HandleTabChange" />
 
-
-    @if(activeTab == "All Polls")
+    @switch (activeTab)
     {
-        <SearchBar AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
-
-        <PollList PollsToDisplay="_pollsToDisplay" />
-    }
-    else if(activeTab == "Create Poll")
-    {
-        <CreatePollForm HandleAdd="@HandleAdd" />
+        case "All Polls": 
+            <SearchBar AllPolls = "_allPolls" HandleSearchInput = "HandleSearchInput" />
+            <PollList PollsToDisplay = "_pollsToDisplay" />
+            break;
+        case "Create Poll":
+            <CreatePollForm HandleAdd="@HandleAdd" />
+            break;
     }
 
 </CascadingValue>
@@ -40,7 +39,7 @@
     {
         var authState = await AuthenticationStateTask;
         string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        loggedInUser = await _userData.GetCurrentUserFromAuthentication(objectId) ?? new();
+        loggedInUser = await _userData.GetCurrentUserFromAuthentication(objectId);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -89,21 +88,11 @@
         }
     }
 
-    public void HandleSearchInput(List<PollModel> filteredPolls)
-    {
-        _pollsToDisplay = filteredPolls;
-        //StateHasChanged();
-    }
+    public void HandleSearchInput(List<PollModel> filteredPolls) => _pollsToDisplay = filteredPolls;
 
-    public void HandleTabChange(string tab)
-    {
-        activeTab = tab;
-    }
+    public void HandleTabChange(string tab) => activeTab = tab;
 
-    public void HandleAdd()
-    {
-        activeTab = "All Polls";
-    }
+    public void HandleAdd() => activeTab = "All Polls";
 }
 
 <style>
