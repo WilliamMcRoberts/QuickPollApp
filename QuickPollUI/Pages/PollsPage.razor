@@ -3,55 +3,50 @@
 @inject IPollService _pollService
 @inject IMongoUserData _userData
 
-<CascadingValue Value="@loggedInUser">
+<CascadingValue Value="_loggedInUser">
 
-    <Tabs ActiveItem="@activeTab" Items="tabs" HandleTabChange="@HandleTabChange" />
+    <Tabs ActiveItem="@activeTab" Items="@tabs" HandleTabChange="HandleTabChange" />
 
     @switch (activeTab)
     {
         case "All Polls": 
-            <SearchBar AllPolls = "_allPolls" HandleSearchInput = "HandleSearchInput" />
-            <PollList PollsToDisplay = "_pollsToDisplay" />
+            <SearchBar AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
+            <PollList PollsToDisplay="_pollsToDisplay" />
             break;
         case "Create Poll":
-            <CreatePollForm HandleAdd="@HandleAdd" />
+            <CreatePollForm HandleAdd="HandleAdd" />
             break;
     }
 
 </CascadingValue>
 
 @code {
-    HubConnection pollHubConnection;
+    private HubConnection _pollHubConnection;
 
     private List<PollModel> _allPolls = new();
     private List<PollModel> _pollsToDisplay = new();
     private List<PollModel> _finishedPolls = new();
 
-    private string[] tabs = new string[] { "All Polls", "Create Poll" };
+    private string[] tabs = new string[2] { "All Polls", "Create Poll" };
     private string activeTab = "All Polls";
 
-    private UserModel loggedInUser;
+    private UserModel _loggedInUser;
 
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateTask;
-        string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        loggedInUser = await _userData.GetCurrentUserFromAuthentication(objectId);
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            pollHubConnection = new HubConnectionBuilder()
+            _loggedInUser = await GetLoggedInUser();
+            
+            _pollHubConnection = new HubConnectionBuilder()
                         .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
                         .WithAutomaticReconnect()
                         .Build();
 
-            pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
+            _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
             {
                 _allPolls = allPolls;
                 _pollsToDisplay = _allPolls;
@@ -72,7 +67,7 @@
             //    InvokeAsync(StateHasChanged);
             //});
 
-            pollHubConnection.On<Guid, PollModel>("getPoll", (pollId, poll) =>
+            _pollHubConnection.On<Guid, PollModel>("getPoll", (pollId, poll) =>
             {
                 var pollToUpdate = _allPolls.Where(p => p.PollId == pollId).FirstOrDefault();
                 if (pollToUpdate is not null)
@@ -83,16 +78,23 @@
                 InvokeAsync(StateHasChanged);
             });
 
-            await pollHubConnection.StartAsync();
+            await _pollHubConnection.StartAsync();
             await _pollService.BroadcastAllPolls();
         }
     }
 
-    public void HandleSearchInput(List<PollModel> filteredPolls) => _pollsToDisplay = filteredPolls;
+    private void HandleSearchInput(List<PollModel> filteredPolls) => _pollsToDisplay = filteredPolls;
 
-    public void HandleTabChange(string tab) => activeTab = tab;
+    private void HandleTabChange(string tab) => activeTab = tab;
 
-    public void HandleAdd() => activeTab = "All Polls";
+    private void HandleAdd() => activeTab = "All Polls";
+
+    private async Task<UserModel> GetLoggedInUser()
+    {
+        var authState = await AuthenticationStateTask;
+        string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
+        return await _userData.GetCurrentUserFromAuthentication(objectId);
+    }
 }
 
 <style>
