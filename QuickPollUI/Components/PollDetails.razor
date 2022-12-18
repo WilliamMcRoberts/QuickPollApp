@@ -21,15 +21,17 @@
             HandleClick="(() => DeletePoll(Poll))">Delete
         </Button>
     </div>
-    @if(!Poll.IsComplete)
+    @switch (Poll.IsComplete)
     {
-        <CountDownTimer />
-    }
-    else
-    {
-        <div class="timer">
-            <p class="finished">Poll Finished</p>
-        </div>
+        case false:
+            <CountDownTimer Poll="@Poll"/>
+            break;
+        case true:
+            <div class="timer">
+                <p class="finished">Poll Finished</p>
+            </div>
+            break;
+
     }
 </Card>
 
@@ -91,11 +93,6 @@
         justify-content: space-between;
     }
 
-    .percent-block {
-        display: flex;
-        justify-content:space-between;
-    }
-
     .poll {
         margin-bottom: 3em;
     }
@@ -106,47 +103,9 @@
         bottom: 10px;
     }
 
-    .percent-even {
-        background: rgba(217, 27, 66, 0.3);
-        border-left: 4px solid #d91b42;
-    }
-
-    .percent-odd {
-        background: rgba(69, 196, 150, 0.3);
-        border-left: 4px solid #45c496;
-    }
-
-    .percent {
-        height: 100%;
-        position: absolute;
-        box-sizing: border-box;
-        transition: .25s ease;
-    }
-
     h3 {
         margin: 0 auto;
         color: #555;
-    }
-
-    p {
-        font-size: 14px;
-        color: #aaa;
-    }
-
-    .answer {
-        background: #fafafa;
-        cursor: pointer;
-        margin: .25em auto;
-        position: relative;
-    }
-
-    .answer:hover {
-        opacity: 0.6;
-    }
-
-    span {
-        display: inline-block;
-        padding: 10px 20px;
     }
 
 </style>

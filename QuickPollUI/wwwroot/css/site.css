@@ -40,3 +40,47 @@ html, body {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+
+.percent {
+    height: 100%;
+    position: absolute;
+    box-sizing: border-box;
+    transition: .25s ease;
+}
+
+.percent-block {
+    display: flex;
+    justify-content: space-between;
+}
+
+.answer {
+    background: #fafafa;
+    cursor: pointer;
+    margin: .25em auto;
+    position: relative;
+}
+
+    .answer:hover {
+        opacity: 0.6;
+    }
+
+span {
+    display: inline-block;
+    padding: 10px 20px;
+}
+
+.percent-even {
+    background: rgba(217, 27, 66, 0.3);
+    border-left: 4px solid #d91b42;
+}
+
+.percent-odd {
+    background: rgba(69, 196, 150, 0.3);
+    border-left: 4px solid #45c496;
+}
+
+p {
+    font-size: 14px;
+    color: #aaa;
+}

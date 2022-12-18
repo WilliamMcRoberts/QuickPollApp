@@ -3,8 +3,10 @@
 <div class="link-container">
         <a class="link" @onclick="CopyLink"> Click Here To Copy Your Poll Link </a>
     <div class="nice-container" style="display: @(Copied ? "block" : "none")">
-        <span class="nice">👌</span>
-        <span class="nice-text">Link Copied</span> 
+        <div class="d-flex">
+            <p class="nice mb-1">👌</p>
+            <p class="nice-text mt-2">Link Copied</p>
+        </div>
     </div>
 </div>
 
@@ -45,8 +47,7 @@
     .nice-container {
         display: flex;
         justify-content: center;
-
-       position: absolute;
+        position: absolute;
     }
 
     .link {

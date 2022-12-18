@@ -1,21 +1,103 @@
 ﻿@page "/polls/{pollId}"
+@inject IMongoUserData _userData
 @inject IPollService _pollService
 
-<h3>@poll.Question</h3>
-@foreach(var option in poll.OptionsList)
+
+<div class="question-container col-lg-4">
+    <h3>@poll.Question</h3>
+    <p>Total Votes: @GetTotalVotes(poll.OptionsList)</p>
+    @switch (poll.IsComplete)
+    {
+        case false:
+            <CountDownTimer Poll="@poll"/>
+            break;
+        case true:
+            <div class="timer">
+                <p class="finished">Poll Finished</p>
+            </div>
+            break;
+    }
+</div>
+@foreach (var option in poll.OptionsList)
 {
-    <div>
-        <p>@option.PollOptionName</p>
-        <p>@option.PollOptionVotes</p>
+    <div @onclick="(() => VoteForOption(poll, option))" class="answer col-lg-8">
+    <div class="percent @(poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(poll.OptionsList)))%"></div>
+        <span class="percent-block">
+            <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
+            <div style="color: @(poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(GetPercentage(option.PollOptionVotes, GetTotalVotes(poll.OptionsList)))%</div> 
+        </span>
     </div>
 }
 
 @code {
     [Parameter]
     public string PollId { get; set; }
+
     private PollModel poll;
-    protected override void OnInitialized()
+
+    private UserModel _loggedInUser;
+
+    [CascadingParameter]
+    public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
     {
         poll = _pollService.AllPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault();
+        _loggedInUser = await GetLoggedInUser();
+
+    }
+
+    private int GetTotalVotes(List<PollOptionModel> pollOptions)
+    {
+        int total = 0;
+
+        foreach (var option in pollOptions)
+        {
+            total += option.PollOptionVotes;
+        }
+
+        return total;
+    }
+
+    private async Task VoteForOption(PollModel poll, PollOptionModel pollOption)
+    {
+        if (poll.UsersVoted.Contains(_loggedInUser.UserId)) return;
+        if (poll.PollCreatorId == _loggedInUser.UserId) return;
+        if (poll.IsComplete) return;
+        if (!poll.HasStarted) return;
+
+        poll.UsersVoted.Add(_loggedInUser.UserId);
+
+        await _pollService.Vote(poll.PollId, pollOption);
+    }
+
+    private decimal GetPercentage(int votes, int totalVotes)
+    {
+        if (totalVotes == 0) return 0;
+        return Math.Round((100 / (decimal)totalVotes * votes), 2);
+    }
+
+    private async Task<UserModel> GetLoggedInUser()
+    {
+        var authState = await AuthenticationStateTask;
+        string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
+        return await _userData.GetCurrentUserFromAuthentication(objectId);
     }
 }
+
+<style>
+    
+
+    .question-container {
+        margin: 2em auto;
+        border: 2px solid red;
+        text-align: center;
+        padding: .5em;
+    }
+
+    .options-container {
+        border: 2px solid orange;
+    }
+
+    
+</style>

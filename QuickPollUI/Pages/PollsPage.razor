@@ -6,17 +6,18 @@
 <CascadingValue Value="_loggedInUser">
 
     <Tabs ActiveItem="@activeTab" Items="@tabs" HandleTabChange="HandleTabChange" />
-
-    @switch (activeTab)
-    {
-        case "All Polls": 
-            <SearchBar AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
-            <PollList PollsToDisplay="_pollsToDisplay" />
-            break;
-        case "Create Poll":
-            <CreatePollForm HandleAdd="HandleAdd" />
-            break;
-    }
+    <div class="ps-4 pe-4">
+        @switch (activeTab)
+        {
+            case "All Polls": 
+                <SearchBar AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
+                <PollList PollsToDisplay="_pollsToDisplay" />
+                break;
+            case "Create Poll":
+                <CreatePollForm HandleAdd="HandleAdd" />
+                break;
+        }
+    </div>
 
 </CascadingValue>
 
