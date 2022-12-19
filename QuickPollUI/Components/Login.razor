@@ -1,0 +1,12 @@
+﻿@inject NavigationManager _nav
+
+<div class="login">
+    <Button HandleClick="StartLogin" ClassType="login">Login / Sign Up </Button>
+</div>
+
+@code {
+    private void StartLogin()
+    {
+        _nav.NavigateTo("/MicrosoftIdentity/Account/SignIn", true);
+    }
+}

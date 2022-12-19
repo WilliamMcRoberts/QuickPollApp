@@ -4,14 +4,21 @@
         @ChildContent
     </div>
     <div class="Modal" id="Modal" style="@("display:" + ( showModal ? $"block; {modalPosition}" : "none;"))">
-        <div class="d-flex justify-content-end">
-            <div class="d-flex justify-content-between">
-                <label class="fw-bold">I have copied and saved my link</label>
-                <input class="checkbox-modal" type="checkbox" @bind="@copyConfirmation" />
-            </div>
+        @if (!IsLogin)
+        {
+            <div class="d-flex justify-content-end">
+                <div class="d-flex justify-content-between">
+                    <label class="confirmation-text">I have copied and saved my link</label>
+                    <input class="checkbox-modal" type="checkbox" @bind="@copyConfirmation" />
+                </div>
 
-        </div>
-        <button class="close-modal-button" @onclick="CloseModal"> ❌ </button>
+            </div>
+            <button class="close-modal-button" @onclick="CloseModal"> ❌ </button>
+        }
+        else
+        {
+            <h3 class="login-text">Please login or sign up to continue</h3>
+        }
 
         <DynamicComponent Type="ComponentType" Parameters="ComponentParameters" />
     </div>
@@ -20,6 +27,8 @@
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; }
+
+    public bool IsLogin { get; set; }
 
     public delegate void ModalClosed();
     public event ModalClosed OnModalClosed;
@@ -31,12 +40,14 @@
     private bool copyConfirmation;
 
     public void ShowModal(
-        MouseEventArgs mouseEventArgs, Type componentType, Dictionary<string, object> componentParameters)
+        MouseEventArgs mouseEventArgs, Type componentType, Dictionary<string, object> componentParameters, bool isLogin)
     {
         modalPosition = $"position: fixed; left: 50%; top: 50% ; transform: translate(-50%,-50%);";
         ComponentType = componentType;
         ComponentParameters = componentParameters;
+        IsLogin = isLogin;
         showModal = true;
+
         StateHasChanged();
     }
 
@@ -52,6 +63,15 @@
 }
 
 <style>
+
+    .login-text {
+        color: #fff;
+    }
+
+    .confirmation-text {
+        font-weight: 700;
+        color: #fff;
+    }
 
     .checkbox-modal {
         margin: 0 1.25em;
