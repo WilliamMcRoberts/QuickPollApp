@@ -21,8 +21,8 @@
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
-    public delegate void modalClosed();
-    public event modalClosed OnModalClosed;
+    public delegate void ModalClosed();
+    public event ModalClosed OnModalClosed;
 
     private bool showModal;
     private string modalPosition;

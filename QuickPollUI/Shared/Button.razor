@@ -26,7 +26,7 @@
     [Parameter]
     public bool UseMouseEventArgs { get; set; }
 
-    public async void OnClick()
+    public async Task OnClick()
     {
         if (UseMouseEventArgs)
         {
@@ -40,7 +40,7 @@
 <style>
 
     .secondary {
-        border: 0;
+        border: 2px solid transparent;
         background: #45c496;
         color: #fff;
         text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);
@@ -54,8 +54,6 @@
         }
 
     .add-option {
-        position: absolute;
-        right: 21%;
         font-weight: 700;
         border-radius: 6px;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
@@ -73,13 +71,12 @@
         background: none;
         color: #d91b42;
         font-size: .75em;
-        position: relative;
         right: 40%;
         margin-top: .5em;
     }
 
     .remove:hover {
-        color: #c5b9b9f7;
+            text-shadow: 0 0 2.5px #c5b9b9f7, 0 0 5px #c5b9b9f7;
     }
 
     .custom-btn {
@@ -87,10 +84,11 @@
         border-radius: 6px;
         padding: 8px 12px;
         font-weight: 700;
+        margin: 0 .5em;
     }
 
     .primary {
-        border: 0;
+        border: 2px solid transparent;
         background: #d91b42;
         color: #fff;
         text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);

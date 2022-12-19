@@ -20,30 +20,30 @@ public class PollService : IPollService
         return _hubContext.Clients.All.SendAsync(method: "getAllPolls", "Server/PollHub", AllPolls);
     }
 
-    public Task RemovePoll(Guid pollId)
+    public Task RemovePoll(PollModel poll)
     {
-        var pollToRemove = AllPolls.Where(p => p.PollId == pollId).FirstOrDefault();
-        if (pollToRemove is not null) AllPolls.Remove(pollToRemove);
-        return _hubContext.Clients.All.SendAsync(method: "getAllPolls", "Server/PollHub", AllPolls);
+        var pollToRemove = AllPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
+
+        if (pollToRemove is null) return Task.CompletedTask;
+        
+        AllPolls.Remove(pollToRemove);
+
+        return BroadcastAllPolls();
     }
 
-    public Task Vote(Guid pollId, PollOptionModel option)
+    public Task UpdatePoll(PollModel poll)
     {
-        var pollToVoteOn = AllPolls.Where(p => p.PollId == pollId)
-                            .FirstOrDefault();
+        var pollToUpdate = AllPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
 
-        if (pollToVoteOn is null) return Task.CompletedTask;
+        if (pollToUpdate is null) return Task.CompletedTask;
 
-        var optionToVoteOn = pollToVoteOn.OptionsList.Where(o => o.PollOptionName == option.PollOptionName)
-                                .FirstOrDefault();
+        AllPolls[AllPolls.IndexOf(pollToUpdate)] = poll;
 
-        if (optionToVoteOn is not null) optionToVoteOn.PollOptionVotes++;
-
-        return _hubContext.Clients.All.SendAsync("getPoll", pollToVoteOn.PollId, pollToVoteOn);
+        return BroadcastAllPolls();
     }
 
     public Task BroadcastAllPolls() =>
-        _hubContext.Clients.All.SendAsync(method: "getAllPolls", "Server/PollHub", AllPolls);
+        _hubContext.Clients.All.SendAsync(method: "getAllPolls", "PollService", AllPolls);
 
     public Task BroadcastActivePolls() =>
         _hubContext.Clients.All.SendAsync("getActivePolls", DateTime.Now, _activePolls);

@@ -68,9 +68,9 @@
             //    InvokeAsync(StateHasChanged);
             //});
 
-            _pollHubConnection.On<Guid, PollModel>("getPoll", (pollId, poll) =>
+            _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
             {
-                var pollToUpdate = _allPolls.Where(p => p.PollId == pollId).FirstOrDefault();
+                var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
                 if (pollToUpdate is not null)
                 {
                     int index = _allPolls.IndexOf(pollToUpdate);

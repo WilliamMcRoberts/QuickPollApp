@@ -1,24 +1,43 @@
 ﻿@inject IPollService _pollService
+@inject NavigationManager _nav
 
 <Card>
     <div class="poll">
         <h3>@Poll.Question</h3>
         <p>Total Votes: @GetTotalVotes(Poll.OptionsList)</p>
-        @foreach(var option in Poll.OptionsList)
-        {
-            <div @onclick="(() => VoteForOption(Poll, option))" class="answer">
-                <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%"></div>
-                <span class="percent-block">
-                    <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
-                    <div style="color: @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%</div> 
-                </span>
+        @foreach (var option in Poll.OptionsList)
+            {
+        <div class="option-container">
+            <Tooltip 
+                    Text="@(Poll.UsersVoted.Contains(LoggedInUser.UserId) && 
+                    option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")" 
+                    BgColor="#BF40BF">
+
+                    <div @onclick="(() => VoteForOption(Poll, option))" class="answer">
+                        <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%"></div>
+                        <span class="percent-block">
+                            <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
+                            <div style="color: @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%</div> 
+                        </span>
+                    </div>
+                </Tooltip>
             </div>
+
         }
     </div>
-    <div class="delete">
+    <div class="delete-details">
+        @if(Poll.PollCreatorId == LoggedInUser.UserId)
+        {
+            <Button 
+                Disabled="@(Poll.PollCreatorId != LoggedInUser?.UserId)" 
+                HandleClick="(() => DeletePoll(Poll))">
+                Delete
+            </Button>
+        }
         <Button 
-            Disabled="@(Poll.PollCreatorId != LoggedInUser?.UserId)" 
-            HandleClick="(() => DeletePoll(Poll))">Delete
+            HandleClick="(() => GoToPollDetailsPage(Poll.PollId))" 
+            ClassType="secondary"> 
+            Details 
         </Button>
     </div>
     @switch (Poll.IsComplete)
@@ -31,7 +50,6 @@
                 <p class="finished">Poll Finished</p>
             </div>
             break;
-
     }
 </Card>
 
@@ -60,27 +78,62 @@
         return total;
     }
 
+    private void GoToPollDetailsPage(Guid pollId)
+    {
+        _nav.NavigateTo($"/polls/{pollId}");
+    }
+
     private async Task VoteForOption(PollModel poll, PollOptionModel pollOption)
     {
+        //if (poll.IsComplete || !poll.HasStarted || poll.PollCreatorId == LoggedInUser.UserId) 
+        //    return;
+
+        if (poll.IsComplete || !poll.HasStarted)
+            return;
+
+        if (poll.UsersVoted.Contains(LoggedInUser.UserId) 
+            && pollOption.PollOptionUsersVoted.Contains(LoggedInUser.UserId))
+        {
+            await UndoVote(poll, pollOption);
+            return;
+        }
+
         if (poll.UsersVoted.Contains(LoggedInUser.UserId)) return;
-        if (poll.PollCreatorId == LoggedInUser.UserId) return;
-        if (poll.IsComplete) return;
-        if (!poll.HasStarted) return;
 
         poll.UsersVoted.Add(LoggedInUser.UserId);
 
-        await _pollService.Vote(poll.PollId, pollOption);
+        pollOption.PollOptionUsersVoted.Add(LoggedInUser.UserId);
+
+        poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionVotes++;
+
+        await _pollService.UpdatePoll(poll);
+    }
+
+    private async Task UndoVote(PollModel poll, PollOptionModel pollOption)
+    {
+        poll.UsersVoted.Remove(LoggedInUser.UserId);
+
+        pollOption.PollOptionUsersVoted.Remove(LoggedInUser.UserId);
+
+        poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionVotes--;
+
+        await _pollService.UpdatePoll(poll);
     }
 
     public void DeletePoll(PollModel poll)
     {
-        if (poll.PollCreatorId != LoggedInUser.UserId) return;
-        if (DateTime.Now < poll.StartTime + poll.TimeLimit) return;
-        _pollService.RemovePoll(poll.PollId);
+        if (poll.PollCreatorId != LoggedInUser.UserId
+            || DateTime.Now < poll.StartTime + poll.TimeLimit) return;
+
+        _pollService.RemovePoll(poll);
     }
 }
 
 <style>
+
+    .option-container {
+        position: relative;
+    }
 
     .finished {
         position: absolute;
@@ -97,10 +150,12 @@
         margin-bottom: 3em;
     }
 
-    .delete {
+    .delete-details {
         text-align: center;
         position: absolute;
         bottom: 10px;
+        display:flex;
+        justify-content: space-between;
     }
 
     h3 {

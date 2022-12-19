@@ -1,15 +1,15 @@
-﻿
-namespace QuickPollLibrary.Services;
-
-public interface IPollService
+﻿namespace QuickPollLibrary.Services
 {
-    List<PollModel> AllPolls { get; set; }
+    public interface IPollService
+    {
+        List<PollModel> AllPolls { get; set; }
 
-    Task AddPoll(PollModel poll);
-    Task BroadcastActivePolls();
-    Task BroadcastAllPolls();
-    Task BroadcastFinishedPolls();
-    Task BroadcastPoll(PollModel poll);
-    Task RemovePoll(Guid pollId);
-    Task Vote(Guid pollId, PollOptionModel option);
+        Task AddPoll(PollModel poll);
+        Task BroadcastActivePolls();
+        Task BroadcastAllPolls();
+        Task BroadcastFinishedPolls();
+        Task BroadcastPoll(PollModel poll);
+        Task RemovePoll(PollModel poll);
+        Task UpdatePoll(PollModel poll);
+    }
 }

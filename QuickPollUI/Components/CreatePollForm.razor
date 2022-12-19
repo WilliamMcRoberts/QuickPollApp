@@ -11,12 +11,14 @@
         <div class="error" style="display: @( string.IsNullOrWhiteSpace(poll.Question) && questionLengthBad ? "block" : "none");color: @("red");"> * Required * </div>
     </div>
 
-    <Button 
-        ClassType="add-option" 
-        HandleClick="AddOption">
-        <span class="plus"> ➕ </span> 
-            Option 
-    </Button>
+    <div class="option-btn-container">
+        <Button 
+            ClassType="add-option" 
+            HandleClick="AddOption">
+            <span class="plus"> ➕ </span> 
+                Option 
+        </Button>
+    </div>
 
     <ul class="options">
         @foreach(var pollOption in poll.OptionsList)
@@ -49,16 +51,22 @@
                 <option value="@TimeSpan.FromHours(1)">1 hour</option>
                 <option value="@TimeSpan.FromHours(1.5)">1.5 hours</option>
                 <option value="@TimeSpan.FromHours(2)">2 hours</option>
+                <option value="@TimeSpan.FromHours(2)">3 hours</option>
                 <option value="@TimeSpan.FromHours(4)">4 hours</option>
                 <option value="@TimeSpan.FromHours(6)">6 hours</option>
+                <option value="@TimeSpan.FromHours(6)">8 hours</option>
                 <option value="@TimeSpan.FromHours(12)">12 hours</option>
                 <option value="@TimeSpan.FromHours(18)">18 hours</option>
                 <option value="@TimeSpan.FromDays(1)">1 Day</option>
                 <option value="@TimeSpan.FromDays(2)">2 Days</option>
-                <option value="@TimeSpan.FromDays(4)">4 Days</option>
+                <option value="@TimeSpan.FromDays(4)">3 Days</option>
+                <option value="@TimeSpan.FromDays(1)">4 Day</option>
+                <option value="@TimeSpan.FromDays(2)">5 Days</option>
+                <option value="@TimeSpan.FromDays(4)">6 Days</option>
+                <option value="@TimeSpan.FromDays(4)">7 Days</option>
             </select>
-            <div>
-                <label class="checkbox-form">No Time Limit</label>
+            <div class="checkbox-container">
+                <label class="checkbox-label">No Limit</label>
                 <input class="checkbox-input" type="checkbox" @bind="@noTimeLimit" />
             </div>
         </div>
@@ -66,8 +74,8 @@
         <div class="time">
             <label>Start 🕰️</label>
             <input style="color: @(startImmediately ? "#aaa" : "#000")" disabled="@startImmediately" class="form-control start input" type="datetime-local" @bind="poll.StartTime" max="2023-07-01T00:00" />
-            <div>
-                <label class="checkbox-form">Start Immediately</label>
+            <div class="checkbox-container">
+                <label class="checkbox-label">Start Now</label>
                 <input class="checkbox-input" type="checkbox" @bind="@startImmediately"/>
             </div>
         </div>
@@ -104,10 +112,8 @@
         TimeLimit = TimeSpan.FromSeconds(0)
     };
 
-    protected override void OnInitialized()
-    {
-        ModalWrapperComponent.OnModalClosed += new ModalWrapper.modalClosed(ModalWrapperComponent_ModalClosed);
-    }
+    protected override void OnInitialized() =>
+        ModalWrapperComponent.OnModalClosed += ModalWrapperComponent_ModalClosed;
 
     public async void ModalWrapperComponent_ModalClosed()
     {
@@ -192,13 +198,16 @@
 
     private bool CheckValidationResults() => questionLengthBad || optionLengthBad || duplicateOptions;
 
-    public void Dispose()
-    {
-        ModalWrapperComponent.OnModalClosed -= new ModalWrapper.modalClosed(ModalWrapperComponent_ModalClosed);
-    }
+    public void Dispose() =>
+        ModalWrapperComponent.OnModalClosed -= ModalWrapperComponent_ModalClosed;
 }
 
 <style>
+
+    .plus {
+        margin: 0;
+        
+    }
 
     .checkbox-input {
         transform: scale(1.5);
@@ -206,12 +215,22 @@
         accent-color: #BF40BF;
     }
 
-    .checkbox-form {
+    .checkbox-container {
+        
+    }
+
+    .checkbox-label {
         font-size: .75em;
+        margin: .5em .25em;
     }
 
     option {
         font-size: .75em;
+    }
+
+    .option-btn-container {
+        position:absolute;
+        right: 21%;
     }
 
     .start {
