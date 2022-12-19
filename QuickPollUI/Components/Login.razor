@@ -1,7 +1,9 @@
 ﻿@inject NavigationManager _nav
 
 <div class="login">
-    <Button HandleClick="StartLogin" ClassType="login">Login / Sign Up </Button>
+    <li class="nav-item">
+        <a class="nav-btn" href="MicrosoftIdentity/Account/SignIn">Log In</a>
+    </li>
 </div>
 
 @code {
@@ -10,3 +12,31 @@
         _nav.NavigateTo("/MicrosoftIdentity/Account/SignIn", true);
     }
 }
+
+<style>
+     li {
+       list-style-type: none;
+    }
+
+    .nav-btn {
+        text-decoration: none;
+        border: 1px solid #f0f;
+        border-radius: 6px;
+        padding: 7px 14px;
+        color: #f0f;
+        font-weight: 900;
+        transition: .25s ease;
+        text-shadow: 0 0 1px whitesmoke, 0 0 2px whitesmoke,0 0 3px whitesmoke;
+        box-shadow: inset 0 0 3px whitesmoke;
+
+    }
+
+    .nav-btn:hover {
+       box-shadow: inset 0 0 60px whitesmoke, inset 20px 0 80px #f0f, inset -20px 0 80px #0ff, inset 20px 0 300px #f0f, inset -20px 0 300px #0ff, 0 0 50px #fff, -10px 0 80px #f0f, 10px 0 80px #0ff;
+            color: #BF40BF;
+        }
+    .login {
+        margin: 1em auto;
+        text-align: center;
+    }
+</style>

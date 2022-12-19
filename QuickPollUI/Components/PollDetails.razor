@@ -8,8 +8,7 @@
         @foreach (var option in Poll.OptionsList)
             {
         <div class="option-container">
-            <Tooltip 
-                    Text="@(Poll.UsersVoted.Contains(LoggedInUser.UserId) && 
+            <Tooltip Text="@(Poll.UsersVoted.Contains(LoggedInUser.UserId) && 
                     option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")" 
                     BgColor="#BF40BF">
 

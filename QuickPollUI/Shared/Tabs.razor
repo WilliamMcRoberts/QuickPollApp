@@ -1,10 +1,10 @@
 ﻿
 
 <div class="tabs">
-    <ul>
+    <ul class="u-list">
         @foreach(var item in Items)
         {
-            <li @onclick="(() => OnTabChosen(item))">
+            <li class="list-item" @onclick="(() => OnTabChosen(item))">
                 <div class="@(ActiveItem == item ? "active" : "")">@item</div>
             </li>
         }
@@ -34,14 +34,14 @@
         margin: 2em auto;
     }
 
-    ul {
+    .u-list {
         display: flex;
         justify-content: center;
         padding: 0;
         list-style-type: none;
     }
 
-    li {
+    .list-item {
         margin: 0 16px;
         font-size: 18px;
         color: #aaa;

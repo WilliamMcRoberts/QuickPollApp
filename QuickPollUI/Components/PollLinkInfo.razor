@@ -1,11 +1,11 @@
 ﻿@inject IJSRuntime _js
 
 <div class="link-container">
-        <a class="link" @onclick="CopyLink"> Click Here To Copy Your Poll Link </a>
+        <a class="link" @onclick="CopyLink"> Click Here To Copy Your Poll Id </a>
     <div class="nice-container" style="display: @(Copied ? "block" : "none")">
         <div class="d-flex">
             <p class="nice mb-1">👌</p>
-            <p class="nice-text mt-2">Link Copied</p>
+            <p class="nice-text mt-2">Poll Id Copied!</p>
         </div>
     </div>
 </div>
@@ -22,7 +22,7 @@
     protected override void OnInitialized()
     {
         var id = CreatedPoll?.PollId;
-        link = $"https://localhost:7176/polls/{id.ToString()}";
+        link = id.ToString();
     }
 
     public async Task CopyLink()
