@@ -1,0 +1,20 @@
+﻿
+@code {
+
+    [CascadingParameter]
+    public ModalWrapper ModalWrapperComponent { get; set; }
+
+    MouseEventArgs mouseArgs;
+
+    protected override void OnInitialized()
+    {
+        ShowLoginModal(mouseArgs);
+    }
+
+    private void ShowLoginModal(MouseEventArgs mouseArgs)
+    {
+        Dictionary<string, object> ParameterArguments = new();
+
+        ModalWrapperComponent.ShowModal(mouseArgs, typeof(Login), ParameterArguments, true);
+    }
+}

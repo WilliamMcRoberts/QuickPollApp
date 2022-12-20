@@ -1,4 +1,5 @@
 ﻿@page "/polls"
+@attribute [Authorize]
 @inject NavigationManager _nav
 @inject IPollService _pollService
 @inject IMongoUserData _userData

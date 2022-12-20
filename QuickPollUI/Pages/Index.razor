@@ -3,57 +3,56 @@
 @inject NavigationManager _nav
 <PageTitle>Home</PageTitle>
 
-
-    <div class="card-container">
-        <div class="card">
-            <div class="face face1">
-                <div class="content">
-                    <i class="fa-solid fa-rectangle-list"></i>                    
-                    <h3>Explore All Polls</h3>
-                </div>
-            </div>
-            <div class="face face2">
-                <div class="content">
-                    <p> Explore all polls that have been created, including active and finished polls.</p>
-                    <a class="nav-btn-card" @onclick="NavigateToPolls" type="button">Let's Go!</a>
-                </div>
+<div class="card-container">
+    <div class="card">
+        <div class="face face1">
+            <div class="content">
+            <i class="fa-solid fa-square-poll-horizontal"></i> 
+            <h3>Explore All Polls</h3>
             </div>
         </div>
-
-        <div class="card">
-            <div class="face face1">
-                <div class="content">
-                    <i class="fa-solid fa-magnifying-glass"></i>                    
-                    <h3>Find A Poll</h3>
-                </div>
-            </div>
-            <div class="face face2">
-                <div class="content">
-                    <div>
-                        <p> Enter your poll id, then click "Find" to navigate to your poll.</p>
-                        <input class="id-input" @bind="@pollId" @bind:event="oninput"/>
-                    </div>
-                    <a @onclick="FindAPoll" class="nav-btn-card" type="button">Find</a>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="card">
-            <div class="face face1">
-                <div class="content">
-                    <i class="fa-solid fa-info"></i>                    
-                    <h3>Quick Poll Info</h3>
-                </div>
-            </div>
-            <div class="face face2">
-                <div class="content">
-                    <p>Info about Quick Poll including support links and contact info.</p>
-                    <a class="nav-btn-card" @onclick="NavigateToInfo" type="button">Take Me There</a>
-                </div>
+        <div class="face face2">
+            <div class="content">
+                <p> Create a poll or explore polls that have already been created, including active and finished polls.</p>
+                <a class="nav-btn-card" @onclick="NavigateToPolls" type="button">Let's Go!</a>
             </div>
         </div>
     </div>
+
+    <div class="card">
+        <div class="face face1">
+            <div class="content">
+                <i class="fa-solid fa-magnifying-glass"></i>                    
+                <h3>Find A Poll</h3>
+            </div>
+        </div>
+        <div class="face face2">
+            <div class="content">
+                <div>
+                    <p> Enter your poll id, then click "Find" to navigate to your poll.</p>
+                    <input class="id-input" @bind="@pollId" @bind:event="oninput"/>
+                </div>
+                <a @onclick="FindAPoll" class="nav-btn-card" type="button">Find</a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="face face1">
+            <div class="content">
+                <i class="fa-solid fa-info"></i>                    
+                <h3>Quick Poll Info</h3>
+            </div>
+        </div>
+        <div class="face face2">
+            <div class="content">
+                <p>Info about Quick Poll including support links and contact info.</p>
+                <a class="nav-btn-card" @onclick="NavigateToInfo" type="button">Take Me There</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
 

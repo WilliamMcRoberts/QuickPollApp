@@ -6,8 +6,8 @@
         <h3>@Poll.Question</h3>
         <p>Total Votes: @GetTotalVotes(Poll.OptionsList)</p>
         @foreach (var option in Poll.OptionsList)
-            {
-        <div class="option-container">
+        {
+            <div class="option-container">
             <Tooltip Text="@(Poll.UsersVoted.Contains(LoggedInUser.UserId) && 
                     option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")" 
                     BgColor="#BF40BF">
@@ -21,7 +21,6 @@
                     </div>
                 </Tooltip>
             </div>
-
         }
     </div>
     <div class="delete-details">
