@@ -47,11 +47,12 @@
             <select style="color: @(noTimeLimit ? "#aaa" : "#000")" class="form-control" @bind="poll.TimeLimit" disabled="@noTimeLimit"> 
                 <option value="@TimeSpan.FromMinutes(1)">1 min</option>
                 <option value="@TimeSpan.FromMinutes(5)">5 min</option>
+                <option value="@TimeSpan.FromMinutes(15)">15 min</option>
                 <option value="@TimeSpan.FromMinutes(30)">30 min</option>
                 <option value="@TimeSpan.FromHours(1)">1 hour</option>
                 <option value="@TimeSpan.FromHours(1.5)">1.5 hours</option>
                 <option value="@TimeSpan.FromHours(2)">2 hours</option>
-                <option value="@TimeSpan.FromHours(2)">3 hours</option>
+                <option value="@TimeSpan.FromHours(3)">3 hours</option>
                 <option value="@TimeSpan.FromHours(4)">4 hours</option>
                 <option value="@TimeSpan.FromHours(6)">6 hours</option>
                 <option value="@TimeSpan.FromHours(6)">8 hours</option>
@@ -59,11 +60,11 @@
                 <option value="@TimeSpan.FromHours(18)">18 hours</option>
                 <option value="@TimeSpan.FromDays(1)">1 Day</option>
                 <option value="@TimeSpan.FromDays(2)">2 Days</option>
-                <option value="@TimeSpan.FromDays(4)">3 Days</option>
-                <option value="@TimeSpan.FromDays(1)">4 Day</option>
-                <option value="@TimeSpan.FromDays(2)">5 Days</option>
-                <option value="@TimeSpan.FromDays(4)">6 Days</option>
-                <option value="@TimeSpan.FromDays(4)">7 Days</option>
+                <option value="@TimeSpan.FromDays(3)">3 Days</option>
+                <option value="@TimeSpan.FromDays(4)">4 Day</option>
+                <option value="@TimeSpan.FromDays(5)">5 Days</option>
+                <option value="@TimeSpan.FromDays(6)">6 Days</option>
+                <option value="@TimeSpan.FromDays(7)">7 Days</option>
             </select>
             <div class="checkbox-container">
                 <label class="checkbox-label">No Limit</label>
