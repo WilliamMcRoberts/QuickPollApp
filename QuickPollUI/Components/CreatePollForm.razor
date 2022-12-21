@@ -132,7 +132,8 @@
         var ParameterArguments = new Dictionary<string, object>
         {
             { "CreatedPoll" , poll },
-            { "Copied", false }
+            { "LinkCopied", false },
+            { "PollIdCopied", false }
         };
 
         ModalWrapperComponent.ShowModal(mouseArgs, typeof(PollLinkInfo), ParameterArguments, false);

@@ -55,20 +55,6 @@
                 InvokeAsync(StateHasChanged);
             });
 
-            //pollHubConnection.On<DateTime, List<PollModel>>("getActivePolls", (time, activePolls) =>
-            //{
-            //    var timeUpdated = time;
-            //    _activePolls = activePolls;
-            //    InvokeAsync(StateHasChanged);
-            //});
-
-            //pollHubConnection.On<DateTime, List<PollModel>>("getFinishedPolls", (time, finishedPolls) =>
-            //{
-            //    var timeUpdated = time;
-            //    _finishedPolls = finishedPolls;
-            //    InvokeAsync(StateHasChanged);
-            //});
-
             _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
             {
                 var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
@@ -98,7 +84,3 @@
         return await _userData.GetCurrentUserFromAuthentication(objectId);
     }
 }
-
-<style>
-   
-</style>

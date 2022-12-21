@@ -1,8 +1,17 @@
 ﻿@inject IJSRuntime _js
 
 <div class="link-container">
-        <a class="link" @onclick="CopyLink"> Click Here To Copy Your Poll Id </a>
-    <div class="nice-container" style="display: @(Copied ? "block" : "none")">
+    <div class="links">
+       <a class="link" @onclick="CopyPollId"> Click Here To Copy Your Poll Id </a>
+        <a class="link" @onclick="CopyLink"> Click Here To Copy Poll Link </a>
+    </div>
+    <div class="nice-container" style="display: @(LinkCopied ? "block" : "none")">
+        <div class="d-flex">
+            <p class="nice mb-1">👌</p>
+            <p class="nice-text mt-2">Link Copied!</p>
+        </div>
+    </div>
+     <div class="nice-container" style="display: @(PollIdCopied ? "block" : "none")">
         <div class="d-flex">
             <p class="nice mb-1">👌</p>
             <p class="nice-text mt-2">Poll Id Copied!</p>
@@ -15,23 +24,45 @@
     public PollModel CreatedPoll { get; set; }
 
     [Parameter]
-    public bool Copied { get; set; }
+    public bool LinkCopied { get; set; }
+
+    [Parameter]
+    public bool PollIdCopied { get; set; }
 
     string link = string.Empty;
+    string pollId = string.Empty;
 
     protected override void OnInitialized()
     {
         var id = CreatedPoll?.PollId;
-        link = id.ToString();
+        pollId = id.ToString();
+        link = $"https://localhost:7176/polls/{pollId}";
+    }
+
+    public async Task CopyPollId()
+    {
+        LinkCopied = false;
+        PollIdCopied = await _js.InvokeAsync<bool>("clipboardCopy", pollId);
     }
 
     public async Task CopyLink()
     {
-        Copied = await _js.InvokeAsync<bool>("clipboardCopy", link);
+        PollIdCopied = false;
+        LinkCopied = await _js.InvokeAsync<bool>("clipboardCopy", link);
     }
 }
 
 <style>
+
+    .links {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .id-text {
+        color: #fff;
+        font-weight: 700;
+    }
 
     .nice-text {
         color: #BF40BF;
@@ -61,6 +92,7 @@
         color: #BF40BF;
         transition: 300ms ease;
         text-shadow: 0 0 2.5px #000, 0 0 5px #000, 0 0 7.5px #000, 0 0 10px #000;
+        margin: 1em auto;
     }
 
     .link:hover {

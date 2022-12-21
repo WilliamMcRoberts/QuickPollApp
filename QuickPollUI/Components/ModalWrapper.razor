@@ -6,12 +6,15 @@
     <div class="Modal" id="Modal" style="@("display:" + ( showModal ? $"block; {modalPosition}" : "none;"))">
         @if (!IsLogin)
         {
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end flex-column">
+                <div class="d-flex justify-content-between">
+                    <label class="confirmation-text">I have copied and saved my poll link</label>
+                    <input class="checkbox-modal" type="checkbox" @bind="@copyLinkConfirmation" />
+                </div>
                 <div class="d-flex justify-content-between">
                     <label class="confirmation-text">I have copied and saved my poll id</label>
-                    <input class="checkbox-modal" type="checkbox" @bind="@copyConfirmation" />
+                    <input class="checkbox-modal" type="checkbox" @bind="@copyPollIdConfirmation" />
                 </div>
-
             </div>
             <button class="close-modal-button" @onclick="CloseModal"> ❌ </button>
         }
@@ -19,7 +22,6 @@
         {
             <h3 class="login-text">Please login or sign up to continue</h3>
         }
-
         <DynamicComponent Type="ComponentType" Parameters="ComponentParameters" />
     </div>
 </CascadingValue>
@@ -37,7 +39,8 @@
     private string modalPosition;
     private Type ComponentType = typeof(TempComponent);
     private Dictionary<string, object> ComponentParameters;
-    private bool copyConfirmation;
+    private bool copyLinkConfirmation;
+    private bool copyPollIdConfirmation;
 
     public void ShowModal(
         MouseEventArgs mouseEventArgs, Type componentType, Dictionary<string, object> componentParameters, bool isLogin)
@@ -53,10 +56,11 @@
 
     public void CloseModal()
     {
-        if (!copyConfirmation) return;
+        if (!copyLinkConfirmation || !copyPollIdConfirmation) return;
 
         showModal = false;
-        copyConfirmation = false;
+        copyLinkConfirmation = false;
+        copyPollIdConfirmation = false;
         OnModalClosed();
         StateHasChanged();
     }
