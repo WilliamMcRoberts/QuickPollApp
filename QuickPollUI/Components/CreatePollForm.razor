@@ -1,4 +1,5 @@
 ﻿@inject IPollService _pollService
+@inject ILogger<CreatePollForm> _logger
 @implements IDisposable
 
 <div class="form-div">
@@ -119,6 +120,11 @@
     public async void ModalWrapperComponent_ModalClosed()
     {
         await HandleSubmit();
+    }
+
+    public void Yill()
+    {
+        _logger.LogInformation("YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");   
     }
 
     public void ShowModal(MouseEventArgs mouseArgs)
