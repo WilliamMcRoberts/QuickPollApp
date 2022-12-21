@@ -8,7 +8,7 @@
     <div class="form-field">
         <label>Question ❔</label>
         <input class="form-control input" id="question" @bind="@poll.Question" @bind:event="oninput"/>
-        <div class="error" style="display: @( string.IsNullOrWhiteSpace(poll.Question) && questionLengthBad ? "block" : "none");color: @("red");"> * Required * </div>
+        <div class="error" style="display: @( string.IsNullOrWhiteSpace(poll.Question) && questionLengthBad ? "block" : "none");"> * Required * </div>
     </div>
 
     <div class="option-btn-container">
