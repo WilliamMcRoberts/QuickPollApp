@@ -2,8 +2,8 @@
 @inject IMongoUserData _userData
 @inject IPollService _pollService
 
-<div class="question-container col-lg-4">
-    <h3>@_poll.Question</h3>
+<div class="question-container">
+    <h3 class="poll-question-text">@_poll.Question</h3>
     <p>Total Votes: @GetTotalVotes(_poll.OptionsList)</p>
     @switch (_poll.IsComplete)
     {
@@ -19,12 +19,18 @@
 </div>
 @foreach (var option in _poll.OptionsList)
 {
-    <div @onclick="(() => VoteForOption(_poll, option))" class="answer col-lg-8">
-        <div class="percent @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(_poll.OptionsList)))%"></div>
-        <span class="percent-block">
-            <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
-            <div style="color: @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(GetPercentage(option.PollOptionVotes, GetTotalVotes(_poll.OptionsList)))%</div> 
-        </span>
+    <div class="option-container">
+        <Tooltip Text="@(_poll.UsersVoted.Contains(_loggedInUser?.UserId) &&
+             option.PollOptionUsersVoted.Contains(_loggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}" : _poll.UsersVoted.Contains(_loggedInUser?.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")"
+             BgColor="#BF40BF">
+            <div @onclick="(() => VoteForOption(_poll, option))" class="answer col-lg-8">
+                <div class="percent @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(_poll.OptionsList)))%"></div>
+                <span class="percent-block">
+                    <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
+                    <div style="color: @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(GetPercentage(option.PollOptionVotes, GetTotalVotes(_poll.OptionsList)))%</div> 
+                </span>
+            </div>
+        </Tooltip>
     </div>
 }
 
@@ -57,15 +63,41 @@
         return total;
     }
 
-    private async Task VoteForOption(PollModel pollToVoteOn, PollOptionModel pollOption)
+    private async Task VoteForOption(PollModel poll, PollOptionModel pollOption)
     {
-        if (pollToVoteOn.UsersVoted.Contains(_loggedInUser.UserId)
-            || pollToVoteOn.PollCreatorId == _loggedInUser.UserId
-            || pollToVoteOn.IsComplete || !pollToVoteOn.HasStarted) return;
+        //if (poll.IsComplete || !poll.HasStarted || poll.PollCreatorId == LoggedInUser.UserId)
+        //    return;
 
-        pollToVoteOn.UsersVoted.Add(_loggedInUser.UserId);
+        if (poll.IsComplete || !poll.HasStarted)
+            return;
 
-        await _pollService.UpdatePoll(pollToVoteOn);
+        if (poll.UsersVoted.Contains(_loggedInUser?.UserId)
+            && pollOption.PollOptionUsersVoted.Contains(_loggedInUser?.UserId))
+        {
+            await UndoVote(poll, pollOption);
+            return;
+        }
+
+        if (poll.UsersVoted.Contains(_loggedInUser?.UserId)) return;
+
+        poll.UsersVoted.Add(_loggedInUser?.UserId);
+
+        pollOption.PollOptionUsersVoted.Add(_loggedInUser?.UserId);
+
+        poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionVotes++;
+
+        await _pollService.UpdatePoll(poll);
+    }
+
+    private async Task UndoVote(PollModel poll, PollOptionModel pollOption)
+    {
+        poll.UsersVoted.Remove(_loggedInUser?.UserId);
+
+        pollOption.PollOptionUsersVoted.Remove(_loggedInUser?.UserId);
+
+        poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionVotes--;
+
+        await _pollService.UpdatePoll(poll);
     }
 
     private decimal GetPercentage(int votes, int totalVotes)
@@ -83,11 +115,22 @@
 }
 
 <style>
-    
+
+    .option-container {
+        position: relative;
+        border: 2px solid green;
+        width: 70%;
+    }
+
+    .poll-question-text {
+        margin-bottom: 1em;
+    }
+
     .question-container {
         margin: 2em auto;
         text-align: center;
         padding: .5em;
+        border: 2px solid red;
     }
 
 </style>
