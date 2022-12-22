@@ -21,6 +21,7 @@
 }
 
 <style>
+
     .id-input {
         margin: .25em auto;
     }
@@ -31,6 +32,16 @@
 
     i {
         margin-bottom: .5em;
+    }
+
+    .card-container {
+        width: 1000px;
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        cursor: text;
+        margin: 6em auto;
     }
 
         .card-container .card {
@@ -125,4 +136,13 @@
                     color: whitesmoke;
                     box-shadow: inset 0px 0px 10px rgba(0,0,0,0.5);
                 }
+
+    @@media(max-width: 1000px) {
+        .card-container {
+            flex-direction: column;
+            align-content: center;
+            width: auto;
+        }
+    }
+
 </style>

@@ -1,24 +1,24 @@
 ﻿@inject NavigationManager _nav
 
-<nav class="nav-menu">
+<div class="nav-menu">
     <div @onclick="NavigateHome" class="logo">Quick Poll</div>
     <div class="">
-        <ul class="">
+        <div class="">
             <AuthorizeView>
                 <Authorized>
-                    <li class="nav-item">
+                    <div class="nav-item">
                         <a class="nav-btn" href="MicrosoftIdentity/Account/SignOut">Log Out</a>
-                    </li>
+                    </div>
                 </Authorized>
                 <NotAuthorized>
-                    <li class="nav-item">
+                    <div class="nav-item">
                         <a class="nav-btn" href="MicrosoftIdentity/Account/SignIn">Log In</a>
-                    </li>
+                    </div>
                 </NotAuthorized>
             </AuthorizeView>
-        </ul>
+        </div>
     </div>
-</nav>
+</div>
 
 @code {
     private void NavigateHome()
@@ -35,10 +35,6 @@
         font-size: 3em;
         margin: 0 1em;
         text-shadow:  5px 0 20px #f0f,  -1px 0 10px #0ff,  5px 0 20px #f0f,  -1px 0 20px #0ff, 0 0 20px #fff, -1px 0 20px #f0f, 5px 0 20px #0ff;
-    }
-
-    li {
-       list-style-type: none;
     }
 
     .nav-btn {
@@ -67,7 +63,20 @@
 
     .nav-item {
         margin: 1.5em 4em;
+    }
 
+    @@media(max-width: 620px) {
+        .nav-menu {
+            flex-direction: column;
+        }
+
+        .logo {
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            text-align: center;
+        }
     }
 
 </style>

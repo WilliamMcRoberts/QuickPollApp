@@ -9,8 +9,8 @@
         {
             <div class="option-container">
                 <Tooltip Text="@(Poll.UsersVoted.Contains(LoggedInUser.UserId) && 
-                    option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")" 
-                    BgColor="#BF40BF">
+                    option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")"
+                     BgColor="#f0f">
 
                     <div @onclick="(() => VoteForOption(Poll, option))" class="answer">
                         <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%"></div>
