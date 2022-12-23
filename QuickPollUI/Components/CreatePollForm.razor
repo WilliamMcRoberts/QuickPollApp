@@ -81,7 +81,12 @@
 
     </div>
 
-    <Button ClassType="secondary" UseMouseEventArgs="true" HandleClickWithMouseArgs="((mouseArgs) => ShowModal(mouseArgs))"> Create Poll </Button>
+    <Button 
+        ClassType="secondary" 
+        UseMouseEventArgs="true" 
+        HandleClickWithMouseArgs="((mouseArgs) => ShowModal(mouseArgs))"> 
+        Create Poll 
+    </Button>
 </div>
 
 @code {
@@ -125,7 +130,7 @@
 
         ValidatePollData();
 
-        if (CheckValidationResults()) return;
+        if (questionLengthBad || optionLengthBad || duplicateOptions) return;
 
         var ParameterArguments = new Dictionary<string, object>
         {
@@ -195,8 +200,6 @@
     }
 
     private void AddOption() => poll.OptionsList.Add(new PollOptionModel() { PollOptionId = Guid.NewGuid() });
-
-    private bool CheckValidationResults() => questionLengthBad || optionLengthBad || duplicateOptions;
 
     public void Dispose() =>
         ModalWrapperComponent.OnModalClosed -= ModalWrapperComponent_ModalClosed;

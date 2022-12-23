@@ -4,7 +4,7 @@
 <Card>
     <div class="poll">
         <h3>@Poll.Question</h3>
-        <p>Total Votes: @GetTotalVotes(Poll.OptionsList)</p>
+        <p>Total Votes: @Poll.OptionsList.GetTotalVotes()</p>
         @foreach (var option in Poll.OptionsList)
         {
             <div class="option-container">
@@ -12,11 +12,11 @@
                     option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")"
                      BgColor="#f0f">
 
-                    <div @onclick="(() => VoteOrUndoVoteForOption(Poll, option))" class="answer">
-                        <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%"></div>
+                    <div @onclick="(() => option.VoteOrUndoVoteForOption(Poll, LoggedInUser, _pollService))" class="answer">
+                        <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%"></div>
                         <span class="percent-block">
-                            <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
-                            <div style="color: @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%</div> 
+                            <div> @option.PollOptionName | @option.PollOptionVotes votes </div>
+                            <div style="color: @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%</div>
                         </span>
                     </div>
                 </Tooltip>
@@ -28,7 +28,7 @@
         {
             <Button 
                 Disabled="@(Poll.PollCreatorId != LoggedInUser?.UserId)" 
-                HandleClick="(() => DeletePoll(Poll))">
+                HandleClick="(() => Poll.DeletePoll(LoggedInUser, _pollService))">
                 Delete
             </Button>
         }
@@ -58,74 +58,10 @@
     [CascadingParameter]
     public UserModel LoggedInUser { get; set; }
 
-    private decimal GetPercentage(int votes, int totalVotes)
-    {
-        if (totalVotes == 0) return 0;
-        return Math.Round((100 / (decimal)totalVotes * votes), 2);
-    }
-
-    private int GetTotalVotes(List<PollOptionModel> pollOptions)
-    {
-        int total = 0;
-
-        foreach (var option in pollOptions)
-        {
-            total += option.PollOptionVotes;
-        }
-
-        return total;
-    }
 
     private void GoToPollDetailsPage(Guid pollId)
     {
         _nav.NavigateTo($"/polls/{pollId}");
-    }
-
-    private async Task VoteOrUndoVoteForOption(PollModel poll, PollOptionModel pollOption)
-    {
-        if (poll.IsComplete || !poll.HasStarted)
-            return;
-
-        if (poll.UsersVoted.Contains(LoggedInUser.UserId) && 
-            pollOption.PollOptionUsersVoted.Contains(LoggedInUser.UserId))
-        {
-            await UndoVote(poll, pollOption);
-            return;
-        }
-
-        if (poll.UsersVoted.Contains(LoggedInUser.UserId)) return;
-
-        await Vote(poll, pollOption);
-    }
-
-    private async Task Vote(PollModel poll, PollOptionModel pollOption)
-    {
-        poll.UsersVoted.Add(LoggedInUser.UserId);
-
-        pollOption.PollOptionUsersVoted.Add(LoggedInUser.UserId);
-
-        poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionVotes++;
-
-        await _pollService.UpdatePoll(poll);
-    }
-
-    private async Task UndoVote(PollModel poll, PollOptionModel pollOption)
-    {
-        poll.UsersVoted.Remove(LoggedInUser.UserId);
-
-        pollOption.PollOptionUsersVoted.Remove(LoggedInUser.UserId);
-
-        poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionVotes--;
-
-        await _pollService.UpdatePoll(poll);
-    }
-
-    public void DeletePoll(PollModel poll)
-    {
-        if (poll.PollCreatorId != LoggedInUser.UserId
-            || DateTime.Now < poll.StartTime + poll.TimeLimit) return;
-
-        _pollService.RemovePoll(poll);
     }
 }
 

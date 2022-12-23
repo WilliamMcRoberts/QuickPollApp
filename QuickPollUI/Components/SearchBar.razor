@@ -1,39 +1,45 @@
 ﻿
-<input type="text" @bind-value="@searchText" @oninput="@(e => OnSearchInput(e))" placeholder="🔍 Search"/>
+<input 
+    type="text" 
+    @bind="@_searchText"
+    @bind:event="oninput"
+    @bind:after="OnSearchInput"
+    placeholder="🔍 Search" 
+    />
+
+
 
 @code {
 
-    string searchText = string.Empty;
+    private string _searchText = string.Empty;
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
     [Parameter]
-    public EventCallback<List<PollModel>> HandleSearchInput { get; set; }
+    public EventCallback<IEnumerable<PollModel>> HandleSearchInput { get; set; }
 
     [Parameter]
     public List<PollModel> AllPolls { get; set; }
 
-    private async Task OnSearchInput(ChangeEventArgs e)
+    private async Task OnSearchInput()
     {
-        searchText = e.Value.ToString();
-
-        if (string.IsNullOrWhiteSpace(searchText))
+        if (string.IsNullOrWhiteSpace(_searchText))
         {
             await HandleSearchInput.InvokeAsync(AllPolls);
             return;
         }
 
-        var output = AllPolls.Where(p => p.Question.Contains(searchText,
+        var output = AllPolls.Where(p => p.Question.Contains(_searchText.Trim(),
             StringComparison.InvariantCultureIgnoreCase) ||
-            p.PollId.ToString().Contains(searchText, StringComparison.InvariantCultureIgnoreCase))
-            .ToList();
+            p.PollId.ToString().Contains(_searchText.Trim(), StringComparison.InvariantCultureIgnoreCase));
 
         await HandleSearchInput.InvokeAsync(output);
     }
 }
 
 <style>
+
     input {
         letter-spacing: 2px;
         text-align:center;
@@ -54,12 +60,5 @@
             width: 50%;
         }
     }
-
-    /*.search-bar-container {
-        margin: 3em auto;
-        position: absolute;
-        right: 12.5%;
-        top: 12%;
-    }*/
 
 </style>

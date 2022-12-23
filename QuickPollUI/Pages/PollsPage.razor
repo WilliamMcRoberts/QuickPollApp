@@ -74,7 +74,8 @@
         }
     }
 
-    private void HandleSearchInput(List<PollModel> filteredPolls) => _pollsToDisplay = filteredPolls;
+    private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) => 
+        _pollsToDisplay = filteredPolls.ToList();
 
     private void HandleTabChange(string tab) => activeTab = tab;
 
