@@ -16,35 +16,32 @@
         <Button 
             ClassType="add-option" 
             HandleClick="AddOption">
-            <span class="plus"> ➕ </span> 
-                Option 
+            <span class="plus"> ➕ </span>
+            <span class="option-btn-text">Option</span>
         </Button>
     </div>
 
-    <ul class="options">
+    <div class="options">
         @foreach(var pollOption in poll.OptionsList)
         {
-            <li>
-                <div class="form-field">
-                    <div style="margin-left: 2em;">
-                        <label>Option #️ @(poll.OptionsList.IndexOf(pollOption) + 1) </label>
-                        <Button 
-                            Disabled="@(poll.OptionsList.Count < 3)" 
-                            ClassType="remove" 
-                            HandleClick="(() => RemoveOption(pollOption))"> 
-                            ❌ 
-                        </Button>
-                    </div>
-                    <input class="form-control input" @bind="poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName" @bind:event="oninput"/>
-                    <div class="error" style="display: @(string.IsNullOrWhiteSpace(pollOption.PollOptionName) && optionLengthBad ? "block" : "none")">* Required *</div>
+            <div class="form-field">
+                <div class="remove-option-btn-container">
+                    <Button Disabled="@(poll.OptionsList.Count < 3)"
+                        ClassType="remove"
+                        HandleClick="(() => RemoveOption(pollOption))">
+                        ❌
+                    </Button>
                 </div>
-            </li>
+                <label>Option #️ @(poll.OptionsList.IndexOf(pollOption) + 1) </label>
+                <input class="form-control input" @bind="poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName" @bind:event="oninput"/>
+                <div class="error" style="display: @(string.IsNullOrWhiteSpace(pollOption.PollOptionName) && optionLengthBad ? "block" : "none")">* Required *</div>
+            </div>
         }
-    </ul>
+    </div>
     <div class="form-field time-field">
 
         <div class="time">
-            <label>🕰️ Limit</label>
+            <label> <span class="clock"> 🕰️ </span> Limit</label>
             <select style="color: @(noTimeLimit ? "#aaa" : "#000")" class="form-control" @bind="poll.TimeLimit" disabled="@noTimeLimit"> 
                 <option value="@TimeSpan.FromMinutes(1)">1 min</option>
                 <option value="@TimeSpan.FromMinutes(5)">5 min</option>
@@ -74,7 +71,7 @@
         </div>
 
         <div class="time">
-            <label>Start 🕰️</label>
+            <label>Start <span class="clock"> 🕰️ </span></label>
             <input style="color: @(startImmediately ? "#aaa" : "#000")" disabled="@startImmediately" class="form-control start input" type="datetime-local" @bind="poll.StartTime" max="2023-07-01T00:00" />
             <div class="checkbox-container">
                 <label class="checkbox-label">Start Now</label>
@@ -120,11 +117,6 @@
     public async void ModalWrapperComponent_ModalClosed()
     {
         await HandleSubmit();
-    }
-
-    public void Yill()
-    {
-        _logger.LogInformation("YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");   
     }
 
     public void ShowModal(MouseEventArgs mouseArgs)
@@ -212,6 +204,11 @@
 
 <style>
 
+    .remove-option-btn-container {
+        position: absolute;
+        margin-top: .25em;
+    }
+
     .plus {
         margin: 0;
         
@@ -221,19 +218,22 @@
         transform: scale(1.5);
         margin: 0 .5em;
         accent-color: #BF40BF;
+        width: auto;
     }
 
     .checkbox-container {
-        
+        display: flex;
+        justify-content: center;
     }
 
     .checkbox-label {
         font-size: .75em;
         margin: .5em .25em;
+        width: auto;
     }
 
     option {
-        font-size: .75em;
+        width: 70%;
     }
 
     .option-btn-container {
@@ -282,13 +282,13 @@
         margin: .5em auto;
         color: #aaa;
         font-size: 18px;
+        width: 100%;
     }
 
     .input {
         width: 100%;
         border-radius: 6px;
         box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);
-        border: none;
     }
 
     label {
@@ -299,8 +299,28 @@
     .options {
         display: flex;
         flex-direction: column;
-        width: 90%;
+        width: 85%;
         margin: 0 auto;
+    }
+
+    @@media(max-width: 600px) {
+        .form-div {
+            width: 100%;
+        }
+
+        .option-btn-container {
+            right: 10%;
+        }
+    }
+
+    @@media(max-width: 410px) {
+        .clock {
+            display: none;
+        }
+
+        .option-btn-text {
+            display: none;
+        }
     }
 
 </style>

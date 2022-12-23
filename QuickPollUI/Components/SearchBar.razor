@@ -1,7 +1,5 @@
 ﻿
-<div class="search-bar-container">
-    <input type="text" @bind-value="@searchText" @oninput="@(e => OnSearchInput(e))" placeholder="🔍 Search"/>
-</div>
+<input type="text" @bind-value="@searchText" @oninput="@(e => OnSearchInput(e))" placeholder="🔍 Search"/>
 
 @code {
 
@@ -51,11 +49,17 @@
         outline-style: none;
     }
 
-    .search-bar-container {
+    @@media(max-width: 890px) {
+        input {
+            width: 50%;
+        }
+    }
+
+    /*.search-bar-container {
         margin: 3em auto;
         position: absolute;
         right: 12.5%;
         top: 12%;
-    }
+    }*/
 
 </style>

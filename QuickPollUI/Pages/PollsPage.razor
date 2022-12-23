@@ -8,11 +8,13 @@
 
     <Tabs ActiveItem="@activeTab" Items="@tabs" HandleTabChange="HandleTabChange" />
 
-    <div class="ps-4 pe-4">
+    <div class="content-container">
         @switch (activeTab)
         {
             case "All Polls": 
-                <SearchBar AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
+                <div class="search-bar-container">
+                    <SearchBar AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
+                </div>
                 <PollList PollsToDisplay="_pollsToDisplay" />
                 break;
             case "Create Poll":
@@ -85,3 +87,28 @@
         return await _userData.GetCurrentUserFromAuthentication(objectId);
     }
 }
+
+<style>
+    .content-container {
+        padding: 0 1em;
+    }
+
+    .search-bar-container {
+        margin: 3em auto;
+        position: absolute;
+        right: 12.5%;
+        top: 12%;
+    }
+
+    @@media(max-width: 890px) {
+        .search-bar-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+            right: auto;
+            top: auto;
+            margin-bottom: 2em;
+        }
+    }
+</style>

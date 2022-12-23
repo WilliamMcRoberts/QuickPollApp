@@ -12,7 +12,7 @@
                     option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")"
                      BgColor="#f0f">
 
-                    <div @onclick="(() => VoteForOption(Poll, option))" class="answer">
+                    <div @onclick="(() => VoteOrUndoVoteForOption(Poll, option))" class="answer">
                         <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(Poll.OptionsList)))%"></div>
                         <span class="percent-block">
                             <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
@@ -81,16 +81,13 @@
         _nav.NavigateTo($"/polls/{pollId}");
     }
 
-    private async Task VoteForOption(PollModel poll, PollOptionModel pollOption)
+    private async Task VoteOrUndoVoteForOption(PollModel poll, PollOptionModel pollOption)
     {
-        //if (poll.IsComplete || !poll.HasStarted || poll.PollCreatorId == LoggedInUser.UserId) 
-        //    return;
-
         if (poll.IsComplete || !poll.HasStarted)
             return;
 
-        if (poll.UsersVoted.Contains(LoggedInUser.UserId) 
-            && pollOption.PollOptionUsersVoted.Contains(LoggedInUser.UserId))
+        if (poll.UsersVoted.Contains(LoggedInUser.UserId) && 
+            pollOption.PollOptionUsersVoted.Contains(LoggedInUser.UserId))
         {
             await UndoVote(poll, pollOption);
             return;
@@ -98,6 +95,11 @@
 
         if (poll.UsersVoted.Contains(LoggedInUser.UserId)) return;
 
+        await Vote(poll, pollOption);
+    }
+
+    private async Task Vote(PollModel poll, PollOptionModel pollOption)
+    {
         poll.UsersVoted.Add(LoggedInUser.UserId);
 
         pollOption.PollOptionUsersVoted.Add(LoggedInUser.UserId);
