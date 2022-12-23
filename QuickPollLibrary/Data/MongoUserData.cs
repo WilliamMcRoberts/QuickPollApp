@@ -12,7 +12,6 @@ public class MongoUserData : IMongoUserData
 
     public async Task<UserModel> GetCurrentUserByUserId(string userId)
     {
-
         var users = await _users.FindAsync(u => u.UserId == userId);
 
         return users.FirstOrDefault();
@@ -20,7 +19,6 @@ public class MongoUserData : IMongoUserData
 
     public async Task<UserModel> GetCurrentUserFromAuthentication(string objectId)
     {
-
         var users = await _users.FindAsync(u => u.ObjectIdentifier == objectId);
 
         return users.FirstOrDefault();

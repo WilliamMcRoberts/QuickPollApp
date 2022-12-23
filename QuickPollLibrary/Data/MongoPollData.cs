@@ -1,8 +1,4 @@
 ﻿
-
-
-
-
 namespace QuickPollLibrary.Data;
 
 public class MongoPollData : IMongoPollData
@@ -33,6 +29,7 @@ public class MongoPollData : IMongoPollData
     public async Task<Guid> CreatePoll(PollModel poll)
     {
         await _polls.InsertOneAsync(poll);
+
         return poll.PollId;
     }
 
