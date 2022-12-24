@@ -5,10 +5,8 @@ public class MongoUserData : IMongoUserData
 {
     private readonly IMongoCollection<UserModel> _users;
 
-    public MongoUserData(IMongoDbConnection mongoDbConnection)
-    {
+    public MongoUserData(IMongoDbConnection mongoDbConnection) =>
         _users = mongoDbConnection.UsersCollection;
-    }
 
     public async Task<UserModel> GetCurrentUserByUserId(string userId)
     {
@@ -24,10 +22,8 @@ public class MongoUserData : IMongoUserData
         return users.FirstOrDefault();
     }
 
-    public Task CreateUser(UserModel user)
-    {
-        return _users.InsertOneAsync(user);
-    }
+    public Task CreateUser(UserModel user) =>
+        _users.InsertOneAsync(user);
 
     public Task UpdateUser(UserModel user)
     {
