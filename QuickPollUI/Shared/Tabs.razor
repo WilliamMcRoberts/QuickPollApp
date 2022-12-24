@@ -21,10 +21,8 @@
     [Parameter]
     public string ActiveItem { get; set; }
 
-    public async Task OnTabChosen(string item)
-    {
+    public async Task OnTabChosen(string item) =>
         await HandleTabChange.InvokeAsync(item);
-    }
 }
 
 <style>

@@ -52,10 +52,9 @@
 
     private string pollId;
 
-    private void NavigateToInfo()
-    {
+    private void NavigateToInfo() =>
         _nav.NavigateTo("/polls");
-    }
+    
 
     private void NavigateToPolls()
     {
@@ -79,10 +78,7 @@
         _nav.NavigateTo($"/polls/{pollId}");
     }
 
-    private void ShowLoginModal(MouseEventArgs mouseArgs)
-    {
-        Dictionary<string, object> ParameterArguments = new();
-
-        ModalWrapperComponent.ShowModal(mouseArgs, typeof(Login), ParameterArguments, true);
-    }
+    private void ShowLoginModal(MouseEventArgs mouseArgs) =>
+        ModalWrapperComponent.ShowModal(
+            mouseArgs, typeof(Login), new Dictionary<string, object> {}, true);
 }

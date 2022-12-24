@@ -1,11 +1,12 @@
 ﻿@page "/polls/{PollId}"
 @inject IMongoUserData _userData
 @inject IPollService _pollService
+@inject NavigationManager _nav
 
 <div class="question-container">
-    <h3 class="poll-question-text">@_poll.Question</h3>
-    <p>Total Votes: @GetTotalVotes(_poll.OptionsList)</p>
-    @switch (_poll.IsComplete)
+    <h3 class="poll-question-text">@_poll?.Question</h3>
+    <p>Total Votes: @_poll?.OptionsList.GetTotalVotes()</p>
+    @switch (_poll?.IsComplete)
     {
         case false:
             <CountDownTimer Poll="@_poll" Position="relative "/>
@@ -17,17 +18,17 @@
             break;
     }
 </div>
-@foreach (var option in _poll.OptionsList)
+@foreach (var option in _poll?.OptionsList)
 {
     <div class="option-container">
         <Tooltip Text="@(_poll.UsersVoted.Contains(_loggedInUser?.UserId) &&
              option.PollOptionUsersVoted.Contains(_loggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}" : _poll.UsersVoted.Contains(_loggedInUser?.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")"
              BgColor="#BF40BF">
-            <div @onclick="(() => VoteForOption(_poll, option))" class="answer col-lg-8">
-                <div class="percent @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(GetPercentage(option.PollOptionVotes, GetTotalVotes(_poll.OptionsList)))%"></div>
+            <div @onclick="(() => option.VoteOrUndoVoteForOption(_poll, _loggedInUser, _pollService))" class="answer col-lg-8">
+                <div class="percent @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
                 <span class="percent-block">
-                    <div> @option.PollOptionName | @option.PollOptionVotes votes </div> 
-                    <div style="color: @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(GetPercentage(option.PollOptionVotes, GetTotalVotes(_poll.OptionsList)))%</div> 
+                    <div> @option.PollOptionName | @option.PollOptionVotes votes </div>
+                    <div style="color: @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%</div>
                 </span>
             </div>
         </Tooltip>
@@ -45,65 +46,40 @@
 
     private UserModel _loggedInUser;
 
+    private HubConnection _pollHubConnection;
+
+    private List<PollModel> _allPolls = new();
+
     protected override async Task OnInitializedAsync()
     {
-        _poll = _pollService.AllPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault();
+        _poll = await Task.FromResult(_pollService.AllPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault());
+
+        _pollHubConnection = new HubConnectionBuilder()
+                    .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
+                    .WithAutomaticReconnect()
+                    .Build();
+
+        _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
+        {
+            _allPolls = allPolls;
+            _poll = _allPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault();
+            InvokeAsync(StateHasChanged);
+        });
+
+        _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
+        {
+            var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
+            if (pollToUpdate is not null)
+            {
+                int index = _allPolls.IndexOf(pollToUpdate);
+                _allPolls[index] = poll;
+            }
+            InvokeAsync(StateHasChanged);
+        });
+
+        await _pollHubConnection.StartAsync();
+
         _loggedInUser = await GetLoggedInUser();
-    }
-
-    private int GetTotalVotes(List<PollOptionModel> pollOptions)
-    {
-        int total = 0;
-
-        foreach (var option in pollOptions)
-        {
-            total += option.PollOptionVotes;
-        }
-
-        return total;
-    }
-
-    private async Task VoteForOption(PollModel poll, PollOptionModel pollOption)
-    {
-        //if (poll.IsComplete || !poll.HasStarted || poll.PollCreatorId == LoggedInUser.UserId)
-        //    return;
-
-        if (poll.IsComplete || !poll.HasStarted)
-            return;
-
-        if (poll.UsersVoted.Contains(_loggedInUser?.UserId)
-            && pollOption.PollOptionUsersVoted.Contains(_loggedInUser?.UserId))
-        {
-            await UndoVote(poll, pollOption);
-            return;
-        }
-
-        if (poll.UsersVoted.Contains(_loggedInUser?.UserId)) return;
-
-        poll.UsersVoted.Add(_loggedInUser?.UserId);
-
-        pollOption.PollOptionUsersVoted.Add(_loggedInUser?.UserId);
-
-        poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionVotes++;
-
-        await _pollService.UpdatePoll(poll);
-    }
-
-    private async Task UndoVote(PollModel poll, PollOptionModel pollOption)
-    {
-        poll.UsersVoted.Remove(_loggedInUser?.UserId);
-
-        pollOption.PollOptionUsersVoted.Remove(_loggedInUser?.UserId);
-
-        poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionVotes--;
-
-        await _pollService.UpdatePoll(poll);
-    }
-
-    private decimal GetPercentage(int votes, int totalVotes)
-    {
-        if (totalVotes == 0) return 0;
-        return Math.Round((100 / (decimal)totalVotes * votes), 2);
     }
 
     private async Task<UserModel> GetLoggedInUser()

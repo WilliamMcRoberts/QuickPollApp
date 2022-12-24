@@ -40,38 +40,35 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            _loggedInUser = await GetLoggedInUser();
+        _loggedInUser = await GetLoggedInUser();
             
-            _pollHubConnection = new HubConnectionBuilder()
-                        .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
-                        .WithAutomaticReconnect()
-                        .Build();
+        _pollHubConnection = new HubConnectionBuilder()
+                    .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
+                    .WithAutomaticReconnect()
+                    .Build();
 
-            _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
+        _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
+        {
+            _allPolls = allPolls;
+            _pollsToDisplay = _allPolls;
+            InvokeAsync(StateHasChanged);
+        });
+
+        _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
+        {
+            var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
+            if (pollToUpdate is not null)
             {
-                _allPolls = allPolls;
-                _pollsToDisplay = _allPolls;
-                InvokeAsync(StateHasChanged);
-            });
+                int index = _allPolls.IndexOf(pollToUpdate);
+                _allPolls[index] = poll;
+            }
+            InvokeAsync(StateHasChanged);
+        });
 
-            _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
-            {
-                var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
-                if (pollToUpdate is not null)
-                {
-                    int index = _allPolls.IndexOf(pollToUpdate);
-                    _allPolls[index] = poll;
-                }
-                InvokeAsync(StateHasChanged);
-            });
-
-            await _pollHubConnection.StartAsync();
-            await _pollService.BroadcastAllPolls();
-        }
+        await _pollHubConnection.StartAsync();
+        await _pollService.BroadcastAllPolls();
     }
 
     private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) => 
