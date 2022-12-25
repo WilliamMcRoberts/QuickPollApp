@@ -9,7 +9,7 @@
     @switch (_poll?.IsComplete)
     {
         case false:
-            <CountDownTimer Poll="@_poll" Position="relative "/>
+            <CountDownTimer Poll="@_poll" />
             break;
         case true:
             <div class="timer">

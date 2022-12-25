@@ -17,10 +17,8 @@
 
     private UserModel _loggedInUser;
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() =>
         await LoadAndVerifyUser();
-    }
 
     private async Task LoadAndVerifyUser()
     {

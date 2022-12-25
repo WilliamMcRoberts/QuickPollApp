@@ -5,6 +5,19 @@
     <div class="poll">
         <h3>@Poll.Question</h3>
         <p>Total Votes: @Poll.OptionsList.GetTotalVotes()</p>
+        @switch (Poll.IsComplete)
+        {
+            case false:
+                <div class="timer-container">
+                    <CountDownTimer Poll="@Poll"/>
+                </div>    
+                break;
+            case true:
+                <div class="timer-container">
+                    <p>Poll Finished</p>
+                </div>
+                break;
+        }
         @foreach (var option in Poll.OptionsList)
         {
             <div class="option-container">
@@ -38,17 +51,7 @@
             Details 
         </Button>
     </div>
-    @switch (Poll.IsComplete)
-    {
-        case false:
-            <CountDownTimer Poll="@Poll"/>
-            break;
-        case true:
-            <div class="timer">
-                <p class="finished">Poll Finished</p>
-            </div>
-            break;
-    }
+    
 </Card>
 
 @code {
@@ -59,22 +62,19 @@
     public UserModel LoggedInUser { get; set; }
 
 
-    private void GoToPollDetailsPage(Guid pollId)
-    {
+    private void GoToPollDetailsPage(Guid pollId) =>
         _nav.NavigateTo($"/polls/{pollId}");
-    }
 }
 
 <style>
 
-    .option-container {
-        position: relative;
+    .timer-container {
+        margin: 0 auto;
+        width: 70%;
     }
 
-    .finished {
-        position: absolute;
-        bottom: 0;
-        right: 30px;
+    .option-container {
+        position: relative;
     }
 
     .option-votes {

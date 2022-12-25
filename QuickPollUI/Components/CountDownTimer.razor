@@ -30,9 +30,6 @@ else
     [Parameter]
     public PollModel Poll { get; set; }
 
-    [Parameter]
-    public string Position { get; set; } = "absolute";
-
     private Timer _timeLimitTimer = new(1000);
 
     private Timer _startsInTimer = new(1000);
@@ -93,20 +90,12 @@ else
 
 <style>
     .timer {
-        right:  @(Position == "absolute" ? "30px" : "auto");
-        bottom: @(Position == "absolute" ? "0" : "auto");
-        margin: @(Position == "absolute" ? "0" : "0 auto");
-        position: @(Position);
         justify-content: space-evenly;
-        width: 50%;
         display: flex;
     }
 
-    @@media(max-width: 770px) {
+    //@@media(max-width: 770px) {
 
-        .timer {
-            width: 70%;
-            right: 0;
-        }
-    }
+
+    //}
 </style>
