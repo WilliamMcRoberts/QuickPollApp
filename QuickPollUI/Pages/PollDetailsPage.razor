@@ -5,15 +5,15 @@
 
 <div class="question-container">
     <h3 class="poll-question-text">@_poll?.Question</h3>
-    <p>Total Votes: @_poll?.OptionsList.GetTotalVotes()</p>
+    <p class="vote-text">TOTAL VOTES : @_poll?.OptionsList.GetTotalVotes()</p>
     @switch (_poll?.IsComplete)
     {
         case false:
-            <CountDownTimer Poll="@_poll" />
+            <CountDownTimer Poll="@_poll" PollComplete="HandlePollComplete"/>
             break;
         case true:
             <div class="timer">
-                <p class="finished">Poll Finished</p>
+                <p class="finished">POLL FINISHED</p>
             </div>
             break;
     }
@@ -22,7 +22,7 @@
 {
     <div class="option-container">
         <Tooltip Text="@(_poll.UsersVoted.Contains(_loggedInUser?.UserId) &&
-             option.PollOptionUsersVoted.Contains(_loggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}" : _poll.UsersVoted.Contains(_loggedInUser?.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")"
+             option.PollOptionUsersVoted.Contains(_loggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}" : _poll.UsersVoted.Contains(_loggedInUser?.UserId) ? "You've Already Voted" : _poll.IsComplete ? "Poll Is Finished" : $"Vote {option.PollOptionName}")"
              BgColor="#BF40BF">
             <div @onclick="(() => option.VoteOrUndoVoteForOption(_poll, _loggedInUser, _pollService))" class="answer col-lg-8">
                 <div class="percent @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
@@ -79,35 +79,51 @@
 
         await _pollHubConnection.StartAsync();
 
-        _loggedInUser = await GetLoggedInUser();
+        await GetLoggedInUser();
     }
 
-    private async Task<UserModel> GetLoggedInUser()
+    private async Task HandlePollComplete()
+    {
+        _poll.IsComplete = true;
+        await _pollService.UpdatePoll(_poll);
+    }
+
+    private async Task GetLoggedInUser()
     {
         var authState = await AuthenticationStateTask;
         string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        return await _userData.GetCurrentUserFromAuthentication(objectId);
+        _loggedInUser = await _userData.GetCurrentUserFromAuthentication(objectId);
     }
 }
 
 <style>
 
+    .finished {
+        font-weight: 700;
+    }
+
+    .vote-text {
+        margin-bottom: 2em;
+        font-weight: 700;
+    }
+
     .option-container {
         position: relative;
-        border: 2px solid green;
         width: 70%;
         margin: 0 auto;
     }
 
     .poll-question-text {
         margin-bottom: 1em;
+        font-family: Poiret One, monospace;
+        font-weight: 900;
+        text-transform: uppercase;
     }
 
     .question-container {
         margin: 2em auto;
         text-align: center;
         padding: .5em;
-        border: 2px solid red;
     }
 
 </style>

@@ -1,22 +1,26 @@
-﻿
+﻿ 
 @if(Poll.TimeLimit is not null && Poll.StartTime < DateTime.Now)
 {
     <div class="timer">
-        <p>Time Limit:</p>
-        <p class="time-unit">@timeLimitDays Days</p>
-        <p class="time-unit">@timeLimitHours Hours</p>
-        <p class="time-unit">@timeLimitMinutes Min</p>
-        <p class="time-unit">@timeLimitSeconds Sec</p>
+        <p class="time-text">TIME LEFT :</p>
+        <div class="times">
+            <p class="time-unit-day">  @timeLimitDays.ToString("00") </p>
+            <p class="time-unit-hour">  @timeLimitHours.ToString("00") </p>
+            <p class="time-unit-min">   @timeLimitMinutes.ToString("00") </p>
+            <p class="time-unit-sec">  @timeLimitSeconds.ToString("00") </p>
+        </div>
     </div>
 }
 else if (Poll.TimeLimit is not null && Poll.StartTime > DateTime.Now)
 {
     <div class="timer">
-        <p>Starts In:</p>
-        <p class="time-unit">@startsInDays Days</p>
-        <p class="time-unit">@startsInHours Hours</p>
-        <p class="time-unit">@startsInMinutes Min</p>
-        <p class="time-unit">@startsInSeconds Sec</p>
+        <p class="time-text">STARTS IN :</p>
+        <div class="times">
+            <p class="time-unit-day">  @startsInDays.ToString("00") </p>
+            <p class="time-unit-hour">  @startsInHours.ToString("00") </p>
+            <p class="time-unit-min">  @startsInMinutes.ToString("00") </p>
+            <p class="time-unit-sec">  @startsInSeconds.ToString("00") </p>
+        </div>
     </div>
 }
 else
@@ -30,6 +34,9 @@ else
     [Parameter]
     public PollModel Poll { get; set; }
 
+    [Parameter]
+    public EventCallback PollComplete { get; set; }
+
     private Timer _timeLimitTimer = new(1000);
 
     private Timer _startsInTimer = new(1000);
@@ -42,8 +49,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _timeLimitTimer.Elapsed += (sender, EventArgs) => CountDownTimeLimit();
-        _startsInTimer.Elapsed += (sender, EventArgs) => CountDownStartsIn();
+        _timeLimitTimer.Elapsed += new ElapsedEventHandler(CountDownTimeLimit);
+        _startsInTimer.Elapsed += new ElapsedEventHandler(CountDownStartsIn);
         if (Poll.StartTime < DateTime.Now)
             _timeLimitTimer.Start();
         else if (Poll.StartTime > DateTime.Now)
@@ -51,7 +58,7 @@ else
         await base.OnInitializedAsync();
     }
 
-    private void CountDownTimeLimit()
+    private void CountDownTimeLimit(object source, ElapsedEventArgs elapsedEventArgs)
     {
         var distance = timeFinished - DateTime.Now;
         if (distance is null) return;
@@ -64,12 +71,13 @@ else
         {
             _timeLimitTimer.Stop();
             Poll.IsComplete = true;
+            InvokeAsync(PollComplete.InvokeAsync);
         }
 
         InvokeAsync(StateHasChanged);
     }
 
-    private void CountDownStartsIn()
+    private void CountDownStartsIn(object source, ElapsedEventArgs elapsedEventArgs)
     {
         var distance = Poll.StartTime - DateTime.Now;
         startsInDays = distance.Days;
@@ -89,9 +97,113 @@ else
 }
 
 <style>
-    .timer {
-        justify-content: space-evenly;
+    .times {
         display: flex;
+        justify-content: space-evenly;
+        position: relative;
+    }
+
+    .timer {
+        flex-direction: column;
+        display: flex;
+        width: 50%;
+        margin: 0 auto;
+    }
+
+    .time-unit-day {
+        font-weight: 700;
+        font-size: 1.25em;
+                font-weight: 900;
+                        letter-spacing: .25em;
+                                                        text-shadow: 2px 2px 5px #000;
+
+    }
+
+    .time-unit-day::before {
+                font-weight: 700;
+
+        content: "Days";
+        position: absolute;
+        top: -1.75em;
+                transform: translateX(-4px);
+
+        text-align: center;
+        font-size: .75em;
+                letter-spacing: 0;
+                        text-transform: uppercase;
+
+    }
+
+    .time-unit-hour {
+        font-weight: 700;
+        font-size: 1.25em;
+                font-weight: 900;
+                        letter-spacing: .25em;
+                                text-shadow: 2px 2px 5px #000;
+
+    }
+
+    .time-unit-hour::before {
+                font-weight: 700;
+
+        content: "Hours";
+        position: absolute;
+        top: -1.75em;
+                transform: translateX(-8px);
+
+        text-align: center;
+        font-size: .75em;
+                letter-spacing: 0;
+                        text-transform: uppercase;
+
+    }
+
+    .time-unit-min {
+        font-weight: 700;
+        font-size: 1.25em;
+                font-weight: 900;
+                        letter-spacing: .25em;
+                                text-shadow: 2px 2px 5px #000;
+
+    }
+
+    .time-unit-min::before {
+        font-weight: 700;
+        content: "Mins";
+        position: absolute;
+        top: -1.75em;
+        transform: translateX(-2px);
+        text-align: center;
+        font-size: .75em;
+        letter-spacing: 0;
+                text-transform: uppercase;
+
+
+    }
+
+    .time-unit-sec {
+        font-weight: 900;
+        font-size: 1.25em;
+        letter-spacing: .25em;
+        text-shadow: 2px 2px 5px #000;
+    }
+
+    .time-unit-sec::before {
+        font-weight: 700;
+        content: "Secs";
+        position: absolute;
+        top: -1.75em;
+        transform: translateX(-5px);
+        text-align: center;
+        font-size: .75em;
+        letter-spacing: 0;
+        text-transform: uppercase;
+
+    }
+
+    .time-text {
+        margin-bottom: 3em;
+        font-weight: 700;
     }
 
     //@@media(max-width: 770px) {

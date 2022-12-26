@@ -1,0 +1,105 @@
+﻿@if(Poll.TimeLimit is not null && Poll.StartTime < DateTime.Now)
+{
+    <div class="timer">
+        <p>Time Limit:</p>
+        <p class="time-unit">@timeLimitDays Days</p>
+        <p class="time-unit">@timeLimitHours Hours</p>
+        <p class="time-unit">@timeLimitMinutes Min</p>
+        <p class="time-unit">@timeLimitSeconds Sec</p>
+    </div>
+}
+else if (Poll.TimeLimit is not null && Poll.StartTime > DateTime.Now)
+{
+    <div class="timer">
+        <p>Starts In:</p>
+        <p class="time-unit">@startsInDays Days</p>
+        <p class="time-unit">@startsInHours Hours</p>
+        <p class="time-unit">@startsInMinutes Min</p>
+        <p class="time-unit">@startsInSeconds Sec</p>
+    </div>
+}
+else
+{
+    <div class="timer">
+        <p>No Time Limit</p>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public PollModel Poll { get; set; }
+
+    [Parameter]
+    public EventCallback PollComplete { get; set; }
+
+    private Timer _timeLimitTimer = new(1000);
+
+    private Timer _startsInTimer = new(1000);
+
+    private int timeLimitDays, timeLimitHours, timeLimitMinutes, timeLimitSeconds;
+
+    private int startsInDays, startsInHours, startsInMinutes, startsInSeconds;
+
+    private DateTime? timeFinished => Poll.TimeLimit is not null ? Poll.StartTime + Poll.TimeLimit : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _timeLimitTimer.Elapsed += (sender, EventArgs) => CountDownTimeLimit();
+        _startsInTimer.Elapsed += (sender, EventArgs) => CountDownStartsIn();
+        if (Poll.StartTime < DateTime.Now)
+            _timeLimitTimer.Start();
+        else if (Poll.StartTime > DateTime.Now)
+            _startsInTimer.Start();
+        await base.OnInitializedAsync();
+    }
+
+    private void CountDownTimeLimit()
+    {
+        var distance = timeFinished - DateTime.Now;
+        if (distance is null) return;
+        timeLimitDays = distance.Value.Days;
+        timeLimitHours = distance.Value.Hours;
+        timeLimitMinutes = distance.Value.Minutes;
+        timeLimitSeconds = distance.Value.Seconds;
+
+        if (timeLimitDays <= 0 && timeLimitHours <= 0 && timeLimitMinutes <= 0 && timeLimitSeconds <= 0)
+        {
+            _timeLimitTimer.Stop();
+            Poll.IsComplete = true;
+            InvokeAsync(PollComplete.InvokeAsync);
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void CountDownStartsIn()
+    {
+        var distance = Poll.StartTime - DateTime.Now;
+        startsInDays = distance.Days;
+        startsInHours = distance.Hours;
+        startsInMinutes = distance.Minutes;
+        startsInSeconds = distance.Seconds;
+
+        if (startsInDays <= 0 && startsInHours <= 0 && startsInMinutes <= 0 && startsInSeconds <= 0)
+        {
+            _startsInTimer.Stop();
+            Poll.HasStarted = true;
+            _timeLimitTimer.Start();
+        }
+
+        InvokeAsync(StateHasChanged);
+    }
+}
+
+<style>
+    .timer {
+        justify-content: space-evenly;
+        display: flex;
+        text-align: center;
+    }
+
+    //@@media(max-width: 770px) {
+
+
+    //}
+</style>

@@ -1,7 +1,8 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 @import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url(https://fonts.googleapis.com/css?family=Poiret+One);
 html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-family: 'Arial' Helvetica Neue, Helvetica, sans-serif;
     background: #57595D;
 }
 

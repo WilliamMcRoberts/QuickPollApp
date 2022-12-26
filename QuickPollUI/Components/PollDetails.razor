@@ -3,13 +3,13 @@
 
 <Card>
     <div class="poll">
-        <h3>@Poll.Question</h3>
+        <h3 class="question-text">@Poll.Question</h3>
         <p>Total Votes: @Poll.OptionsList.GetTotalVotes()</p>
         @switch (Poll.IsComplete)
         {
             case false:
                 <div class="timer-container">
-                    <CountDownTimer Poll="@Poll"/>
+                    <CountDownTimerSimple Poll="@Poll" PollComplete="HandlePollComplete" />
                 </div>    
                 break;
             case true:
@@ -22,13 +22,13 @@
         {
             <div class="option-container">
                 <Tooltip Text="@(Poll.UsersVoted.Contains(LoggedInUser.UserId) && 
-                    option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : $"Vote {option.PollOptionName}")"
+                    option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : Poll.IsComplete ? "Poll Is Finished" : $"Vote {option.PollOptionName}")"
                      BgColor="#f0f">
 
                     <div @onclick="(() => option.VoteOrUndoVoteForOption(Poll, LoggedInUser, _pollService))" class="answer">
                         <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%"></div>
                         <span class="percent-block">
-                            <div> @option.PollOptionName | @option.PollOptionVotes votes </div>
+                            <div> @option.PollOptionName | @option.PollOptionVotes Votes </div>
                             <div style="color: @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%</div>
                         </span>
                     </div>
@@ -64,13 +64,26 @@
 
     private void GoToPollDetailsPage(Guid pollId) =>
         _nav.NavigateTo($"/polls/{pollId}");
+
+    private async Task HandlePollComplete()
+    {
+        Poll.IsComplete = true;
+        await _pollService.UpdatePoll(Poll);
+    }
 }
 
 <style>
 
+    .question-text {
+        font-family: Poiret One, monospace;
+        font-weight: 900;
+        text-transform: uppercase;
+    }
+
     .timer-container {
         margin: 0 auto;
         width: 70%;
+        text-align: center;
     }
 
     .option-container {
