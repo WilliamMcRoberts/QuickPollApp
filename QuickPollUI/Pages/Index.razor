@@ -1,10 +1,11 @@
 ﻿@page "/"
 @inject IMongoUserData _userData
+@inject IPollService _pollService
 @inject NavigationManager _nav
 
 <PageTitle>Home</PageTitle>
 
-<CascadingValue Value="_loggedInUser">
+<CascadingValue Value="_loggedInUser">  
 
     <HomeCards />
 
@@ -17,8 +18,10 @@
 
     private UserModel _loggedInUser;
 
-    protected override async Task OnInitializedAsync() =>
+    protected override async Task OnInitializedAsync()
+    {
         await LoadAndVerifyUser();
+    }
 
     private async Task LoadAndVerifyUser()
     {

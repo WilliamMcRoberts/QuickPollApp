@@ -14,10 +14,10 @@ public class PollService : IPollService
         _hubContext = hubContext;
     }
 
-    public Task AddPoll(PollModel poll)
+    public async Task AddPoll(PollModel poll)
     {
         AllPolls.Add(poll);
-        return _hubContext.Clients.All.SendAsync(method: "getAllPolls", "Server/PollHub", AllPolls);
+        await BroadcastAllPolls();
     }
 
     public Task RemovePoll(PollModel poll)
@@ -25,7 +25,7 @@ public class PollService : IPollService
         var pollToRemove = AllPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
 
         if (pollToRemove is null) return Task.CompletedTask;
-        
+
         AllPolls.Remove(pollToRemove);
 
         return BroadcastAllPolls();
