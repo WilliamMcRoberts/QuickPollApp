@@ -1,5 +1,4 @@
 ﻿
-
 using QuickPollLibrary.Services;
 
 namespace QuickPollLibrary.Helpers;

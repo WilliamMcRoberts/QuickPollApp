@@ -22,7 +22,7 @@ public class PollService : IPollService
 
     public Task RemovePoll(PollModel poll)
     {
-        var pollToRemove = AllPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
+        var pollToRemove = AllPolls.FirstOrDefault(p => p.PollId == poll.PollId);
 
         if (pollToRemove is null) return Task.CompletedTask;
 
@@ -33,7 +33,7 @@ public class PollService : IPollService
 
     public Task UpdatePoll(PollModel poll)
     {
-        var pollToUpdate = AllPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
+        var pollToUpdate = AllPolls.FirstOrDefault(p => p.PollId == poll.PollId);
 
         if (pollToUpdate is null) return Task.CompletedTask;
 
