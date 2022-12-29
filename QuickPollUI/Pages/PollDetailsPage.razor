@@ -3,32 +3,24 @@
 @inject IPollService _pollService
 @inject NavigationManager _nav
 
+
 <div class="question-container">
     <h3 class="poll-question-text">@_poll?.Question</h3>
     <p class="vote-text">TOTAL VOTES : @_poll?.OptionsList.GetTotalVotes()</p>
-    @switch (_poll?.IsComplete)
-    {
-        case false:
-            <CountDownTimer Poll="@_poll" PollComplete="HandlePollComplete"/>
-            break;
-        case true:
-            <div class="timer">
-                <p class="finished">POLL FINISHED</p>
-            </div>
-            break;
-    }
+
+     <CountDownTimer Poll="@_poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
+
 </div>
 @foreach (var option in _poll?.OptionsList)
 {
     <div class="option-container">
-        <Tooltip Text="@(_poll.UsersVoted.Contains(_loggedInUser?.UserId) &&
-             option.PollOptionUsersVoted.Contains(_loggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}" : _poll.UsersVoted.Contains(_loggedInUser?.UserId) ? "You've Already Voted" : _poll.IsComplete ? "Poll Is Finished" : $"Vote {option.PollOptionName}")"
+        <Tooltip Text="@GetTooltipText(option)"
              BgColor="#BF40BF">
-            <div @onclick="(() => option.VoteOrUndoVoteForOption(_poll, _loggedInUser, _pollService))" class="answer col-lg-8">
-                <div class="percent @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
+            <div @onclick="(() => option.VoteOrUndoVoteForOption(_poll, _loggedInUser, _pollService))" style="background:  @GetAnswerBackgroundColor(option);" class="answer col-lg-8">
+                <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
                 <span class="percent-block">
-                    <div> @option.PollOptionName | @option.PollOptionVotes votes </div>
-                    <div style="color: @(_poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%</div>
+                    <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(@option.PollOptionVotes != 1 ? "Votes" : "Vote") </div>
+                    <div class="percent-text" style="color: @GetPercentTextColor(option)">@(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%</div>
                 </span>
             </div>
         </Tooltip>
@@ -88,6 +80,30 @@
         await _pollService.UpdatePoll(_poll);
     }
 
+    private async Task HandlePollHasStarted()
+    {
+        _poll.HasStarted = true;
+        await _pollService.UpdatePoll(_poll);
+    }
+
+    private string GetAnswerBackgroundColor(PollOptionModel option) =>
+        _poll.OptionsList.IndexOf(option) % 2 == 0 ? "rgba(217, 27, 66, 0.2)" : "rgba(69, 196, 150, 0.2)";
+
+    private string GetPercentTextColor(PollOptionModel option) =>
+        _poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496";
+
+    private string GetPercentClass(PollOptionModel option) =>
+        _poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd";
+
+    private string GetTooltipText(PollOptionModel option)
+    {
+        return _poll.UsersVoted.Contains(_loggedInUser?.UserId) && option.PollOptionUsersVoted.Contains(_loggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}" 
+                : _poll.UsersVoted.Contains(_loggedInUser?.UserId) ? "You've Already Voted" 
+                : !_poll.HasStarted ? "Poll Has Not Started Yet" 
+                : _poll.IsComplete ? "Poll Is Finished" 
+                : $"Vote {option.PollOptionName}";
+    }
+
     private async Task GetLoggedInUser()
     {
         var authState = await AuthenticationStateTask;
@@ -98,6 +114,52 @@
 
 <style>
 
+    .percent-even {
+        background: rgba(217, 27, 66, 0.3);
+        border-left: 4px solid #d91b42;
+    }
+
+    .percent-odd {
+        background: rgba(69, 196, 150, 0.3);
+        border-left: 4px solid #45c496;
+    }
+
+    p {
+        font-size: 14px;
+        color: #aaa;
+    }
+
+    .percent {
+        height: 100%;
+        position: absolute;
+        box-sizing: border-box;
+        transition: .25s ease;
+    }
+
+    .percent-block {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 20px;
+    }
+
+    .answer {
+        cursor: pointer;
+        margin: .25em auto;
+        position: relative;
+    }
+
+    .option-text {
+        font-weight: 700;
+        font-family: 'News Cycle', sans-serif;
+    }
+
+    .percent-text {
+        font-weight: 900;
+        text-shadow: 1px 2px 1px #000, 1px 2px 2px #000, 1px 2px 3px #000, 1px 2px 4px #000;
+        letter-spacing: 1px;
+
+    }
+
     .finished {
         font-weight: 700;
     }
@@ -105,25 +167,44 @@
     .vote-text {
         margin-bottom: 2em;
         font-weight: 700;
+        font-size: 1em;
     }
 
     .option-container {
-        position: relative;
-        width: 70%;
+        width: 90%;
         margin: 0 auto;
     }
 
     .poll-question-text {
         margin-bottom: 1em;
-        font-family: Poiret One, monospace;
-        font-weight: 900;
-        text-transform: uppercase;
+        font-family: 'Chakra Petch', sans-serif;
     }
 
     .question-container {
         margin: 2em auto;
         text-align: center;
-        padding: .5em;
+        padding: 1em;
+    }
+
+    @@media(max-width: 700px) {
+        .percent-block {
+            height: 4em;
+        }
+
+        .percent-text {
+            margin-top: .5em;
+        }
+    }
+
+    @@media(max-width: 360px) {
+        .percent-block {
+            height: 6em;
+        }
+
+        .percent-text {
+            margin-top: 1.5em;
+
+        }
     }
 
 </style>

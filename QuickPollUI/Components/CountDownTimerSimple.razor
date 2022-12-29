@@ -1,29 +1,41 @@
-﻿@if(Poll.TimeLimit is not null && Poll.StartTime < DateTime.Now)
+﻿
+@if(!Poll.IsComplete)
 {
-    <div class="timer">
-        <p>Time Limit:</p>
-        <p class="time-unit">@timeLimitDays Days</p>
-        <p class="time-unit">@timeLimitHours Hours</p>
-        <p class="time-unit">@timeLimitMinutes Min</p>
-        <p class="time-unit">@timeLimitSeconds Sec</p>
-    </div>
+    if (Poll.TimeLimit is not null && Poll.StartTime < DateTime.Now)
+    {
+            <div class="timer">
+                <p>Time Limit:</p>
+                <p class="time-unit">@timeLimitDays.ToString("00") d</p>
+            <p class="time-unit">@timeLimitHours.ToString("00") h</p>
+            <p class="time-unit">@timeLimitMinutes.ToString("00") m</p>
+            <p class="time-unit">@timeLimitSeconds.ToString("00") s</p>
+            </div>
+    }
+    else if (Poll.TimeLimit is not null && Poll.StartTime > DateTime.Now)
+    {
+            <div class="timer">
+                <p>Starts In:</p>
+            <p class="time-unit">@startsInDays.ToString("00") d</p>
+            <p class="time-unit">@startsInHours.ToString("00") h</p>
+            <p class="time-unit">@startsInMinutes.ToString("00") m</p>
+            <p class="time-unit">@startsInSeconds.ToString("00") s</p>
+            </div>
+    }
+    else
+    {
+            <div class="timer">
+                <p>No Time Limit</p>
+        </div>
+    }
 }
-else if (Poll.TimeLimit is not null && Poll.StartTime > DateTime.Now)
-{
-    <div class="timer">
-        <p>Starts In:</p>
-        <p class="time-unit">@startsInDays Days</p>
-        <p class="time-unit">@startsInHours Hours</p>
-        <p class="time-unit">@startsInMinutes Min</p>
-        <p class="time-unit">@startsInSeconds Sec</p>
-    </div>
-}
+
 else
 {
     <div class="timer">
-        <p>No Time Limit</p>
+        <p>Poll Finished</p>
     </div>
 }
+
 
 @code {
     [Parameter]
@@ -31,6 +43,9 @@ else
 
     [Parameter]
     public EventCallback PollComplete { get; set; }
+
+    [Parameter]
+    public EventCallback PollHasStarted { get; set; }
 
     private Timer _timeLimitTimer = new(1000);
 
@@ -44,16 +59,21 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _timeLimitTimer.Elapsed += (sender, EventArgs) => CountDownTimeLimit();
-        _startsInTimer.Elapsed += (sender, EventArgs) => CountDownStartsIn();
+        _timeLimitTimer.Elapsed += new ElapsedEventHandler(CountDownTimeLimit);
+        _startsInTimer.Elapsed += new ElapsedEventHandler(CountDownStartsIn);
+
         if (Poll.StartTime < DateTime.Now)
+        {
+            Poll.HasStarted = true;
             _timeLimitTimer.Start();
+            await PollHasStarted.InvokeAsync();
+        }
         else if (Poll.StartTime > DateTime.Now)
             _startsInTimer.Start();
         await base.OnInitializedAsync();
     }
 
-    private void CountDownTimeLimit()
+    private void CountDownTimeLimit(object source, ElapsedEventArgs elapsedEventArgs)
     {
         var distance = timeFinished - DateTime.Now;
         if (distance is null) return;
@@ -72,7 +92,7 @@ else
         InvokeAsync(StateHasChanged);
     }
 
-    private void CountDownStartsIn()
+    private void CountDownStartsIn(object source, ElapsedEventArgs elapsedEventArgs)
     {
         var distance = Poll.StartTime - DateTime.Now;
         startsInDays = distance.Days;
@@ -85,6 +105,7 @@ else
             _startsInTimer.Stop();
             Poll.HasStarted = true;
             _timeLimitTimer.Start();
+            InvokeAsync(PollHasStarted.InvokeAsync);
         }
 
         InvokeAsync(StateHasChanged);

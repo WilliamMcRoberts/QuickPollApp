@@ -5,35 +5,24 @@
     <div class="poll">
         <h3 class="question-text">@Poll.Question</h3>
         <p>Total Votes: @Poll.OptionsList.GetTotalVotes()</p>
-        @switch (Poll.IsComplete)
-        {
-            case false:
-                <div class="timer-container">
-                    <CountDownTimerSimple Poll="@Poll" PollComplete="HandlePollComplete" />
-                </div>    
-                break;
-            case true:
-                <div class="timer-container">
-                    <p>Poll Finished</p>
-                </div>
-                break;
-        }
+
+        <div class="timer-container">
+            <CountDownTimerSimple Poll="@Poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
+        </div>    
+
         @foreach (var option in Poll.OptionsList)
         {
-            <div class="option-container">
-                <Tooltip Text="@(Poll.UsersVoted.Contains(LoggedInUser.UserId) && 
-                    option.PollOptionUsersVoted.Contains(LoggedInUser.UserId) ? $"Undo Vote {option.PollOptionName}" : Poll.UsersVoted.Contains(LoggedInUser.UserId) ? "You've Already Voted" : Poll.IsComplete ? "Poll Is Finished" : $"Vote {option.PollOptionName}")"
-                     BgColor="#f0f">
+            <Tooltip Text="@GetTooltipText(option)"
+                    BgColor="#f0f">
 
-                    <div @onclick="(() => option.VoteOrUndoVoteForOption(Poll, LoggedInUser, _pollService))" class="answer">
-                        <div class="percent @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd")" style="width: @(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%"></div>
-                        <span class="percent-block">
-                            <div> @option.PollOptionName | @option.PollOptionVotes Votes </div>
-                            <div style="color: @(Poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496")">@(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%</div>
-                        </span>
-                    </div>
-                </Tooltip>
-            </div>
+                <div @onclick="(() => option.VoteOrUndoVoteForOption(Poll, LoggedInUser, _pollService))" style="background: @GetAnswerBackgroundColor(option);" class="answer">
+                    <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%"></div>
+                    <span class="percent-block">
+                        <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(option.PollOptionVotes != 1 ? "Votes" : "Vote")</div>
+                        <div class="percent-text" style="color: @GetPercentTextColor(option)">@(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%</div>
+                    </span>
+                </div>
+            </Tooltip>
         }
     </div>
     <div class="delete-details">
@@ -61,6 +50,23 @@
     [CascadingParameter]
     public UserModel LoggedInUser { get; set; }
 
+    private string GetAnswerBackgroundColor(PollOptionModel option) =>
+        Poll.OptionsList.IndexOf(option) % 2 == 0 ? "rgba(217, 27, 66, 0.2)" : "rgba(69, 196, 150, 0.2)";
+
+    private string GetPercentTextColor(PollOptionModel option) =>
+        Poll.OptionsList.IndexOf(option) % 2 == 0 ? "#d91b42" : "#45c496";
+
+    private string GetPercentClass(PollOptionModel option) =>
+        Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd";
+
+    private string GetTooltipText(PollOptionModel option)
+    {
+        return Poll.UsersVoted.Contains(LoggedInUser?.UserId) && option.PollOptionUsersVoted.Contains(LoggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}"
+                : Poll.UsersVoted.Contains(LoggedInUser?.UserId) ? "You've Already Voted"
+                : !Poll.HasStarted ? "Poll Has Not Started Yet"
+                : Poll.IsComplete ? "Poll Is Finished"
+                : $"Vote {option.PollOptionName}";
+    }
 
     private void GoToPollDetailsPage(Guid pollId) =>
         _nav.NavigateTo($"/polls/{pollId}");
@@ -70,24 +76,70 @@
         Poll.IsComplete = true;
         await _pollService.UpdatePoll(Poll);
     }
+
+    private async Task HandlePollHasStarted()
+    {
+        Poll.HasStarted = true;
+        await _pollService.UpdatePoll(Poll);
+    }
 }
 
 <style>
 
-    .question-text {
-        font-family: Poiret One, monospace;
+    .percent {
+        height: 100%;
+        position: absolute;
+        box-sizing: border-box;
+        transition: .25s ease;
+    }
+
+    .percent-block {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 20px;
+    }
+
+    .answer {
+        cursor: pointer;
+        margin: .25em auto;
+        position: relative;
+    }
+
+    .percent-even {
+        background: rgba(217, 27, 66, 0.3);
+        border-left: 4px solid #d91b42;
+    }
+
+    .percent-odd {
+        background: rgba(69, 196, 150, 0.3);
+        border-left: 4px solid #45c496;
+    }
+
+    p {
+        font-size: 14px;
+        color: #aaa;
+    }
+
+
+    .option-text {
+        font-weight: 700;
+        font-family: 'News Cycle', sans-serif;
+    }
+
+    .percent-text {
         font-weight: 900;
-        text-transform: uppercase;
+        text-shadow: 1px 2px 1px rgba(0, 0, 0, 0.8), 1px 2px 2px rgba(0, 0, 0, 0.8), 1px 2px 3px rgba(0, 0, 0, 0.8), 1px 2px 4px rgba(0, 0, 0, 0.8);
+        letter-spacing: 1px;
+    }
+
+    .question-text {
+        font-family: 'Chakra Petch', sans-serif;
     }
 
     .timer-container {
         margin: 0 auto;
         width: 70%;
         text-align: center;
-    }
-
-    .option-container {
-        position: relative;
     }
 
     .option-votes {
@@ -111,5 +163,29 @@
         margin: 0 auto;
         color: #555;
     }
+
+    @@media(max-width: 650px) {
+        .percent-block {
+            height: 4em;
+        }
+
+        .percent-text {
+            margin-top: .5em;
+        }
+
+    }
+
+    @@media(max-width: 420px) {
+        .percent-block {
+            height: 6em;
+        }
+
+        .percent-text {
+            margin-top: 1.5em;
+        }
+
+    }
+
+    
 
 </style>

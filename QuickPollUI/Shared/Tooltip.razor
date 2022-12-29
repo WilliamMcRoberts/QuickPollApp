@@ -1,8 +1,10 @@
 ﻿
-<div class="wrapper">
-    <div class="icon facebook">
-        <span class="tooltip">@Text</span>
-        @ChildContent
+<div class="tooltip-container">
+    <div class="wrapper">
+        <div class="icon facebook">
+            <span class="tooltip">@Text</span>
+            @ChildContent
+        </div>
     </div>
 </div>
 
@@ -16,6 +18,10 @@
 
 <style>
 
+    .tooltip-container {
+        position: relative;
+    }
+
     .tooltip {
         font-weight: 700;
     }
@@ -23,7 +29,7 @@
     .wrapper .tooltip {
         position: absolute;
         top: 0;
-        left: 65%;
+        left: 60%;
         font-size: 14px;
         background: @BgColor;
         color: #ffffff;
@@ -45,7 +51,7 @@
 
     .wrapper .icon:hover .tooltip {
         top: -45px;
-        left: 65%;
+        left: 60%;
         opacity: 1;
         visibility: visible;
         pointer-events: auto;
