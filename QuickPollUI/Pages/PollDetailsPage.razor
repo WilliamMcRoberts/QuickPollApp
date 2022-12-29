@@ -14,8 +14,7 @@
 @foreach (var option in _poll?.OptionsList)
 {
     <div class="option-container">
-        <Tooltip Text="@GetTooltipText(option)"
-             BgColor="#BF40BF">
+        <Tooltip Text="@GetTooltipText(option)" BgColor="#f0f">
             <div @onclick="(() => option.VoteOrUndoVoteForOption(_poll, _loggedInUser, _pollService))" style="background:  @GetAnswerBackgroundColor(option);" class="answer col-lg-8">
                 <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
                 <span class="percent-block">

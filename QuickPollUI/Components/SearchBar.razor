@@ -7,8 +7,6 @@
     placeholder="🔍 Search" 
     />
 
-
-
 @code {
 
     private string _searchText = string.Empty;
@@ -30,9 +28,8 @@
             return;
         }
 
-        var output = AllPolls.Where(p => p.Question.Contains(_searchText.Trim(),
-            StringComparison.InvariantCultureIgnoreCase) ||
-            p.PollId.ToString().Contains(_searchText.Trim(), StringComparison.InvariantCultureIgnoreCase));
+        var output = AllPolls.Where(p => p.Question.Contains(_searchText.Trim(), StringComparison.InvariantCultureIgnoreCase) 
+                    || p.PollId.ToString().Contains(_searchText.Trim(), StringComparison.InvariantCultureIgnoreCase));
 
         await HandleSearchInput.InvokeAsync(output);
     }

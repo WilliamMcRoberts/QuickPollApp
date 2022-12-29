@@ -42,8 +42,8 @@
     private bool copyLinkConfirmation;
     private bool copyPollIdConfirmation;
 
-    public void ShowModal(
-        MouseEventArgs mouseEventArgs, Type componentType, Dictionary<string, object> componentParameters, bool isLogin)
+    public void ShowModal(MouseEventArgs mouseEventArgs, Type componentType, 
+        Dictionary<string, object> componentParameters, bool isLogin)
     {
         modalPosition = $"position: fixed; left: 50%; top: 50% ; transform: translate(-50%,-50%);";
         ComponentType = componentType;
