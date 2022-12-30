@@ -52,9 +52,8 @@ try
     app.MapBlazorHub();
 
     /*********************** Hubs ***************************************/
-    app.MapHub<ChatHub>("/chathub");
+
     app.MapHub<PollHub>("/pollhub");
-    /********************** End Hubs ************************************/
 
     app.MapFallbackToPage("/_Host");
 
