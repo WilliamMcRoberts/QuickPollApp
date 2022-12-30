@@ -1,7 +1,7 @@
 ﻿@page "/polls"
 @attribute [Authorize]
 @inject NavigationManager _nav
-@inject IPollService _pollService
+@inject IPollManager _pollManager
 @inject IMongoUserData _userData
 
 <CascadingValue Value="_loggedInUser">
@@ -68,7 +68,7 @@
         });
 
         await _pollHubConnection.StartAsync();
-        await _pollService.BroadcastAllPolls();
+        await _pollManager.BroadcastAllPolls();
     }
 
     private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) => 

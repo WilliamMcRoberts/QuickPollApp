@@ -1,34 +1,32 @@
 ﻿
+
 namespace QuickPollLibrary.Data;
 
-public class MongoUserData : IMongoUserData
+public class MongoUserData : BaseData<UserModel>, IMongoUserData
 {
-    private readonly IMongoCollection<UserModel> _users;
 
-    public MongoUserData(IMongoDbConnection mongoDbConnection) =>
-        _users = mongoDbConnection.UsersCollection;
+    public MongoUserData(IMongoDbConnection mongoDbConnection) : base(mongoDbConnection, "users")
+    {
+    }
 
     public async Task<UserModel> GetCurrentUserByUserId(string userId)
     {
-        var users = await _users.FindAsync(u => u.UserId == userId);
+        var users = await _collection.FindAsync(u => u.UserId == userId);
 
         return users.FirstOrDefault();
     }
 
     public async Task<UserModel> GetCurrentUserFromAuthentication(string objectId)
     {
-        var users = await _users.FindAsync(u => u.ObjectIdentifier == objectId);
+        var users = await _collection.FindAsync(u => u.ObjectIdentifier == objectId);
 
         return users.FirstOrDefault();
     }
-
-    public Task CreateUser(UserModel user) =>
-        _users.InsertOneAsync(user);
 
     public Task UpdateUser(UserModel user)
     {
         var filter = Builders<UserModel>.Filter.Eq("UserId", user.UserId);
 
-        return _users.ReplaceOneAsync(filter, user, new ReplaceOptions { IsUpsert = true });
+        return _collection.ReplaceOneAsync(filter, user, new ReplaceOptions { IsUpsert = true });
     }
 }

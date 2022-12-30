@@ -1,6 +1,7 @@
 ﻿@page "/"
+@inject IUnitOfWork _unitOfWork
 @inject IMongoUserData _userData
-@inject IPollService _pollService
+@inject IMongoPollData _pollData
 @inject NavigationManager _nav
 
 <PageTitle>Home</PageTitle>
@@ -72,7 +73,7 @@
         {
             if (string.IsNullOrWhiteSpace(_loggedInUser.UserId))
             {
-                await _userData.CreateUser(_loggedInUser);
+                await _unitOfWork.Users.CreateOne(_loggedInUser);
                 return;
             }
 

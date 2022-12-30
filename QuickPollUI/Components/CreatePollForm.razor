@@ -1,4 +1,4 @@
-﻿@inject IPollService _pollService
+﻿@inject IPollManager _pollManager
 @inject ILogger<CreatePollForm> _logger
 @implements IDisposable
 
@@ -105,6 +105,8 @@
     bool startImmediately = true;
     bool noTimeLimit = true;
 
+    ModalWrapper.ModalClosed modalClosed;
+
     PollModel poll = new()
     {
         OptionsList = new()
@@ -116,13 +118,14 @@
         TimeLimit = TimeSpan.FromSeconds(0)
     };
 
-    protected override void OnInitialized() =>
-        ModalWrapperComponent.OnModalClosed += ModalWrapperComponent_ModalClosed;
-
-    public async void ModalWrapperComponent_ModalClosed()
+    protected override void OnInitialized() 
     {
-        await HandleSubmit();
+        modalClosed = new ModalWrapper.ModalClosed(ModalWrapperComponent_ModalClosed);
+
+        ModalWrapperComponent.OnModalClosed += modalClosed;
     }
+
+    public async void ModalWrapperComponent_ModalClosed() => await HandleSubmit();
 
     public void ShowModal(MouseEventArgs mouseArgs)
     {
@@ -146,7 +149,7 @@
     {
         SetPollData();
 
-        await _pollService.AddPoll(poll);
+        await _pollManager.AddPoll(poll);
 
         poll = new()
         {
@@ -192,17 +195,11 @@
             poll.OptionsList.Remove(pollOption);
     }
 
-    private void ResetBooleans()
-    {
-        optionLengthBad = false;
-        questionLengthBad = false;
-        duplicateOptions = false;
-    }
+    private void ResetBooleans() => (optionLengthBad, questionLengthBad, duplicateOptions) = (false, false, false);
 
     private void AddOption() => poll.OptionsList.Add(new PollOptionModel() { PollOptionId = Guid.NewGuid() });
 
-    public void Dispose() =>
-        ModalWrapperComponent.OnModalClosed -= ModalWrapperComponent_ModalClosed;
+    public void Dispose() => ModalWrapperComponent.OnModalClosed -= modalClosed;
 }
 
 <style>

@@ -1,12 +1,14 @@
-﻿
-namespace QuickPollLibrary.DbAccess;
-
-public interface IMongoDbConnection
+﻿namespace QuickPollLibrary.DbAccess
 {
-    MongoClient Client { get; }
-    string DatabaseName { get; }
-    IMongoCollection<PollModel> PollsCollection { get; }
-    string PollsCollectionName { get; }
-    IMongoCollection<UserModel> UsersCollection { get; }
-    string UsersCollectionName { get; }
+    public interface IMongoDbConnection
+    {
+        MongoClient Client { get; }
+        string DatabaseName { get; }
+        IMongoCollection<PollModel> PollsCollection { get; }
+        string PollsCollectionName { get; }
+        IMongoCollection<UserModel> UsersCollection { get; }
+        string UsersCollectionName { get; }
+
+        IMongoCollection<T> GetCollection<T>(string collectionName);
+    }
 }

@@ -1,4 +1,5 @@
-﻿@inject IPollService _pollService
+﻿@inject IPollManager _pollManager
+@inject IUnitOfWork _unitOfWork
 @inject NavigationManager _nav
 
 <Card>
@@ -13,7 +14,7 @@
         @foreach (var option in Poll.OptionsList)
         {
             <Tooltip Text="@GetTooltipText(option)" BgColor="#f0f">
-                <div @onclick="(() => option.VoteOrUndoVoteForOption(Poll, LoggedInUser, _pollService))" style="background: @GetAnswerBackgroundColor(option);" class="answer">
+                <div @onclick="(() => VoteOrUndoVoteForOption(option))" style="background: @GetAnswerBackgroundColor(option);" class="answer">
                     <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%"></div>
                     <span class="percent-block">
                         <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(option.PollOptionVotes != 1 ? "Votes" : "Vote")</div>
@@ -28,7 +29,7 @@
         {
             <Button 
                 Disabled="@(Poll.PollCreatorId != LoggedInUser?.UserId)" 
-                HandleClick="(() => Poll.DeletePoll(LoggedInUser, _pollService))">
+                HandleClick="(() => DeletePoll(Poll, LoggedInUser))">
                 Delete
             </Button>
         }
@@ -47,6 +48,16 @@
 
     [CascadingParameter]
     public UserModel LoggedInUser { get; set; }
+
+    private async Task VoteOrUndoVoteForOption(PollOptionModel pollOption)
+    {
+        await _pollManager.VoteOrUndoVoteForOption(pollOption, Poll, LoggedInUser);
+    }
+
+    private async Task DeletePoll(PollModel poll, UserModel loggedInUser)
+    {
+        await _pollManager.DeletePoll(poll, loggedInUser);
+    }
 
     private string GetAnswerBackgroundColor(PollOptionModel option) =>
         Poll.OptionsList.IndexOf(option) % 2 == 0 ? "rgba(217, 27, 66, 0.2)" : "rgba(69, 196, 150, 0.2)";
@@ -72,13 +83,14 @@
     private async Task HandlePollComplete()
     {
         Poll.IsComplete = true;
-        await _pollService.UpdatePoll(Poll);
+        await _unitOfWork.Polls.CreateOne(Poll);
+        await _pollManager.UpdatePoll(Poll);
     }
 
     private async Task HandlePollHasStarted()
     {
         Poll.HasStarted = true;
-        await _pollService.UpdatePoll(Poll);
+        await _pollManager.UpdatePoll(Poll);
     }
 }
 

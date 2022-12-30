@@ -1,4 +1,7 @@
 ﻿
+using QuickPollLibrary.Managers;
+using QuickPollLibrary.UnitOfWork;
+
 namespace QuickPollUI;
 
 public static class RegisterServices
@@ -23,9 +26,10 @@ public static class RegisterServices
             .AddMicrosoftIdentityConsentHandler();
 
         builder.Services.AddSingleton<IMongoDbConnection, MongoDbConnection>();
-        builder.Services.AddSingleton<IMongoUserData, MongoUserData>();
-        builder.Services.AddSingleton<IMongoPollData, MongoPollData>();
-        builder.Services.AddSingleton<IPollService, PollService>();
-        builder.Services.AddSingleton<IChatService, ChatService>();
+        builder.Services.AddTransient<IMongoUserData, MongoUserData>();
+        builder.Services.AddTransient<IMongoPollData, MongoPollData>();
+        builder.Services.AddSingleton<IPollManager, PollManager>();
+        builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+        builder.Services.AddTransient(typeof(IBaseData<>), typeof(BaseData<>));
     }
 }

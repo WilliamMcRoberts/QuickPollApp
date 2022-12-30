@@ -26,4 +26,9 @@ public class MongoDbConnection : IMongoDbConnection
         UsersCollection = _mongoDatabase.GetCollection<UserModel>(UsersCollectionName);
         PollsCollection = _mongoDatabase.GetCollection<PollModel>(PollsCollectionName);
     }
+
+    public IMongoCollection<T> GetCollection<T>(string collectionName)
+    {
+        return _mongoDatabase.GetCollection<T>(collectionName);
+    }
 }

@@ -1,6 +1,6 @@
 ﻿@page "/polls/{PollId}"
 @inject IMongoUserData _userData
-@inject IPollService _pollService
+@inject IPollManager _pollManager
 @inject NavigationManager _nav
 
 
@@ -15,11 +15,11 @@
 {
     <div class="option-container">
         <Tooltip Text="@GetTooltipText(option)" BgColor="#f0f">
-            <div @onclick="(() => option.VoteOrUndoVoteForOption(_poll, _loggedInUser, _pollService))" style="background:  @GetAnswerBackgroundColor(option);" class="answer col-lg-8">
+            <div @onclick="(() => VoteOrUndoVoteForOption(option))" style="background:  @GetAnswerBackgroundColor(option);" class="answer col-lg-8">
                 <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
                 <span class="percent-block">
                     <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(@option.PollOptionVotes != 1 ? "Votes" : "Vote") </div>
-                    <div class="percent-text" style="color: @GetPercentTextColor(option)">@(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%</div>
+                    <div class="percent-text" style="color: @GetPercentTextColor(option)"> @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))% </div>
                 </span>
             </div>
         </Tooltip>
@@ -43,7 +43,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _poll = await Task.FromResult(_pollService.AllPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault());
+        _poll = await _pollManager.GetPollById(PollId);
 
         _pollHubConnection = new HubConnectionBuilder()
                     .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
@@ -73,16 +73,21 @@
         await GetLoggedInUser();
     }
 
+    private void VoteOrUndoVoteForOption(PollOptionModel pollOption)
+    {
+        _pollManager.VoteOrUndoVoteForOption(pollOption, _poll, _loggedInUser);
+    }
+
     private async Task HandlePollComplete()
     {
         _poll.IsComplete = true;
-        await _pollService.UpdatePoll(_poll);
+        await _pollManager.UpdatePoll(_poll);
     }
 
     private async Task HandlePollHasStarted()
     {
         _poll.HasStarted = true;
-        await _pollService.UpdatePoll(_poll);
+        await _pollManager.UpdatePoll(_poll);
     }
 
     private string GetAnswerBackgroundColor(PollOptionModel option) =>
