@@ -1,13 +1,12 @@
-﻿using System.Linq.Expressions;
+﻿
+namespace QuickPollLibrary.Data;
 
-namespace QuickPollLibrary.Data
+public interface IBaseData<T>
 {
-    public interface IBaseData<T>
-    {
-        Task CreateOne(T item);
-        Task DeletePoll(Expression<Func<T, bool>> expression);
-        Task<List<T>> GetAll();
-        Task<T> GetOne(Expression<Func<T, bool>> expression);
-        Task UpdateOne(Expression<Func<T, bool>> expression, UpdateDefinition<T> update);
-    }
+    Task CreateOneAsync(T item);
+    Task DeletePollAsync(Expression<Func<T, bool>> expression);
+    Task<List<T>> GetAllAsync();
+    Task<T> GetOneAsync(Expression<Func<T, bool>> expression);
+    Task UpdateOneAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> update);
+    Task ReplaceOneAsync(string field, string id, T obj);
 }

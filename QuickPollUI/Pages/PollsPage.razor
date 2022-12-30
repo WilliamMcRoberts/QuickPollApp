@@ -2,7 +2,7 @@
 @attribute [Authorize]
 @inject NavigationManager _nav
 @inject IPollManager _pollManager
-@inject IMongoUserData _userData
+@inject IUnitOfWork _unitOfWork
 
 <CascadingValue Value="_loggedInUser">
 
@@ -43,11 +43,30 @@
     protected override async Task OnInitializedAsync()
     {
         _loggedInUser = await GetLoggedInUser();
-            
+
+        await ConnectToPollHubAndBraodcastAllPolls();
+    }
+
+    private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) => 
+        _pollsToDisplay = filteredPolls.ToList();
+
+    private void HandleTabChange(string tab) => activeTab = tab;
+
+    private void HandleAdd() => activeTab = "All Polls";
+
+    private async Task<UserModel> GetLoggedInUser()
+    {
+        var authState = await AuthenticationStateTask;
+        string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
+        return await _unitOfWork.Users.GetOneAsync(u => u.ObjectIdentifier == objectId);
+    }
+
+    private async Task ConnectToPollHubAndBraodcastAllPolls()
+    {
         _pollHubConnection = new HubConnectionBuilder()
-                    .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
-                    .WithAutomaticReconnect()
-                    .Build();
+                            .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
+                            .WithAutomaticReconnect()
+                            .Build();
 
         _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
         {
@@ -70,23 +89,10 @@
         await _pollHubConnection.StartAsync();
         await _pollManager.BroadcastAllPolls();
     }
-
-    private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) => 
-        _pollsToDisplay = filteredPolls.ToList();
-
-    private void HandleTabChange(string tab) => activeTab = tab;
-
-    private void HandleAdd() => activeTab = "All Polls";
-
-    private async Task<UserModel> GetLoggedInUser()
-    {
-        var authState = await AuthenticationStateTask;
-        string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        return await _userData.GetCurrentUserFromAuthentication(objectId);
-    }
 }
 
 <style>
+
     .content-container {
         padding: 0 1em;
     }

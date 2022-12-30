@@ -1,5 +1,5 @@
 ﻿@page "/polls/{PollId}"
-@inject IMongoUserData _userData
+@inject IUnitOfWork _unitOfWork
 @inject IPollManager _pollManager
 @inject NavigationManager _nav
 
@@ -45,38 +45,13 @@
     {
         _poll = await _pollManager.GetPollById(PollId);
 
-        _pollHubConnection = new HubConnectionBuilder()
-                    .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
-                    .WithAutomaticReconnect()
-                    .Build();
+        await ConnectToPollHub();
 
-        _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
-        {
-            _allPolls = allPolls;
-            _poll = _allPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault();
-            InvokeAsync(StateHasChanged);
-        });
-
-        _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
-        {
-            var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
-            if (pollToUpdate is not null)
-            {
-                int index = _allPolls.IndexOf(pollToUpdate);
-                _allPolls[index] = poll;
-            }
-            InvokeAsync(StateHasChanged);
-        });
-
-        await _pollHubConnection.StartAsync();
-
-        await GetLoggedInUser();
+        _loggedInUser = await GetLoggedInUser();
     }
 
-    private void VoteOrUndoVoteForOption(PollOptionModel pollOption)
-    {
+    private void VoteOrUndoVoteForOption(PollOptionModel pollOption) =>
         _pollManager.VoteOrUndoVoteForOption(pollOption, _poll, _loggedInUser);
-    }
 
     private async Task HandlePollComplete()
     {
@@ -108,11 +83,39 @@
                 : $"Vote {option.PollOptionName}";
     }
 
-    private async Task GetLoggedInUser()
+    private async Task<UserModel> GetLoggedInUser()
     {
         var authState = await AuthenticationStateTask;
         string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        _loggedInUser = await _userData.GetCurrentUserFromAuthentication(objectId);
+        return await _unitOfWork.Users.GetOneAsync(u => u.ObjectIdentifier == objectId);
+    }
+
+    private async Task ConnectToPollHub()
+    {
+         _pollHubConnection = new HubConnectionBuilder()
+                    .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
+                    .WithAutomaticReconnect()
+                    .Build();
+
+        _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
+        {
+            _allPolls = allPolls;
+            _poll = _allPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault();
+            InvokeAsync(StateHasChanged);
+        });
+
+        _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
+        {
+            var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
+            if (pollToUpdate is not null)
+            {
+                int index = _allPolls.IndexOf(pollToUpdate);
+                _allPolls[index] = poll;
+            }
+            InvokeAsync(StateHasChanged);
+        });
+
+        await _pollHubConnection.StartAsync();
     }
 }
 

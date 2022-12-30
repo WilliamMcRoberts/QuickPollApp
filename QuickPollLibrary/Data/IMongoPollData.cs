@@ -1,7 +1,6 @@
-﻿namespace QuickPollLibrary.Data
+﻿namespace QuickPollLibrary.Data;
+
+public interface IMongoPollData : IBaseData<PollModel>
 {
-    public interface IMongoPollData : IBaseData<PollModel>
-    {
-        Task<List<PollModel>> GetFirst100Polls();
-    }
+    Task<List<PollModel>> GetFirst100Polls();
 }

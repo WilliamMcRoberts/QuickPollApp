@@ -28,7 +28,8 @@
     {
         var authState = await AuthenticationStateTask;
         string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        _loggedInUser = await _userData.GetCurrentUserFromAuthentication(objectId) ?? new();
+        _loggedInUser = await _unitOfWork.Users.GetOneAsync(u => u.ObjectIdentifier == objectId) ?? new();
+
 
         if (string.IsNullOrWhiteSpace(objectId)) return;
 
@@ -73,11 +74,12 @@
         {
             if (string.IsNullOrWhiteSpace(_loggedInUser.UserId))
             {
-                await _unitOfWork.Users.CreateOne(_loggedInUser);
+                await _unitOfWork.Users.CreateOneAsync(_loggedInUser);
                 return;
             }
 
-            await _userData.UpdateUser(_loggedInUser);
+            await _unitOfWork.Users.ReplaceOneAsync("UserId", _loggedInUser.UserId, _loggedInUser);
+            //await _userData.UpdateUser(_loggedInUser);
         }
     }
 }

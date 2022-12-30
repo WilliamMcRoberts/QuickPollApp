@@ -1,6 +1,7 @@
 ﻿
 using DnsClient.Internal;
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 
 namespace QuickPollLibrary.Data;
 
@@ -15,21 +16,21 @@ public class BaseData<T> : IBaseData<T> where T : class
         _collection = mongoDbConnection.GetCollection<T>(collectionName);
     }
 
-    public async Task<List<T>> GetAll()
+    public async Task<List<T>> GetAllAsync()
     {
         var results = await _collection.FindAsync(new BsonDocument());
 
         return results.ToList();
     }
 
-    public async Task<T> GetOne(Expression<Func<T, bool>> expression)
+    public async Task<T> GetOneAsync(Expression<Func<T, bool>> expression)
     {
-        var item = await _collection.FindAsync(expression);
+        var results = await _collection.FindAsync(expression);
 
-        return (T)item;
+        return results.FirstOrDefault();
     }
 
-    public async Task CreateOne(T item)
+    public async Task CreateOneAsync(T item)
     {
         try
         {
@@ -40,12 +41,19 @@ public class BaseData<T> : IBaseData<T> where T : class
         }
     }
 
-    public async Task UpdateOne(Expression<Func<T, bool>> expression, UpdateDefinition<T> update)
+    public Task ReplaceOneAsync(string field, string id, T obj)
+    {
+        var filter = Builders<T>.Filter.Eq(field, id);
+
+        return _collection.ReplaceOneAsync(filter, obj, new ReplaceOptions { IsUpsert = true });
+    }
+
+    public async Task UpdateOneAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> update)
     {
         await _collection.UpdateOneAsync(expression, update);
     }
 
-    public async Task DeletePoll(Expression<Func<T, bool>> expression)
+    public async Task DeletePollAsync(Expression<Func<T, bool>> expression)
     {
         await _collection.DeleteOneAsync(expression);
     }
