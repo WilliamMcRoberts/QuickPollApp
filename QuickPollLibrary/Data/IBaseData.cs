@@ -8,5 +8,5 @@ public interface IBaseData<T>
     Task<List<T>> GetAllAsync();
     Task<T> GetOneAsync(Expression<Func<T, bool>> expression);
     Task UpdateOneAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> update);
-    Task ReplaceOneAsync(string field, string id, T obj);
+    Task ReplaceOneAsync(string itemId, T item, string field = "Id");
 }

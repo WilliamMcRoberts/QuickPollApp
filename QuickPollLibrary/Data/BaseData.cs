@@ -1,8 +1,4 @@
 ﻿
-using DnsClient.Internal;
-using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
-
 namespace QuickPollLibrary.Data;
 
 public class BaseData<T> : IBaseData<T> where T : class
@@ -41,11 +37,11 @@ public class BaseData<T> : IBaseData<T> where T : class
         }
     }
 
-    public Task ReplaceOneAsync(string field, string id, T obj)
+    public Task ReplaceOneAsync(string itemId, T item, string field = "Id")
     {
-        var filter = Builders<T>.Filter.Eq(field, id);
+        var filter = Builders<T>.Filter.Eq(field, itemId);
 
-        return _collection.ReplaceOneAsync(filter, obj, new ReplaceOptions { IsUpsert = true });
+        return _collection.ReplaceOneAsync(filter, item, new ReplaceOptions { IsUpsert = true });
     }
 
     public async Task UpdateOneAsync(Expression<Func<T, bool>> expression, UpdateDefinition<T> update)

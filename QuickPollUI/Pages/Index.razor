@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using MongoDB.Driver;
 @inject IUnitOfWork _unitOfWork
 @inject IMongoUserData _userData
 @inject IMongoPollData _pollData
@@ -57,7 +58,7 @@
             isDirty = true;
             _loggedInUser.LastName = lastName;
         }
-
+        displayName = "FockinNewDisplayNameFockin";
         if (!displayName.Equals(_loggedInUser.DisplayName))
         {
             isDirty = true;
@@ -78,8 +79,7 @@
                 return;
             }
 
-            await _unitOfWork.Users.ReplaceOneAsync("UserId", _loggedInUser.UserId, _loggedInUser);
-            //await _userData.UpdateUser(_loggedInUser);
+            await _unitOfWork.Users.ReplaceOneAsync(_loggedInUser.UserId, _loggedInUser, "UserId");
         }
     }
 }
