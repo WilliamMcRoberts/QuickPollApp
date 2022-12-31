@@ -1,5 +1,4 @@
 ﻿
-
 namespace QuickPollLibrary.Managers;
 
 public class PollManager : IPollManager
@@ -8,11 +7,9 @@ public class PollManager : IPollManager
 
     private List<PollModel> _allPolls = new();
 
-    public PollManager(IHubContext<PollHub> hubContext)
-    {
+    public PollManager(IHubContext<PollHub> hubContext) =>
         _hubContext = hubContext;
-    }
-
+    
     public async Task AddPoll(PollModel poll)
     {
         _allPolls.Add(poll);
@@ -42,11 +39,6 @@ public class PollManager : IPollManager
         _allPolls[_allPolls.IndexOf(pollToUpdate)] = poll;
 
         await BroadcastAllPolls();
-    }
-
-    public async Task<PollModel> GetPollById(string pollId)
-    {
-        return await Task.FromResult(_allPolls.FirstOrDefault(p => p.PollId.ToString() == pollId)!);
     }
 
     public async Task Vote(PollOptionModel pollOption, PollModel poll, UserModel loggedInUser)
@@ -89,7 +81,9 @@ public class PollManager : IPollManager
         await Vote(pollOption, poll, loggedInUser);
     }
 
+    public async Task<PollModel> GetPollById(string pollId) =>
+        await Task.FromResult(_allPolls.FirstOrDefault(p => p.PollId.ToString() == pollId)!);
+
     public async Task BroadcastAllPolls() =>
         await _hubContext.Clients.All.SendAsync(method: "getAllPolls", "PollService", _allPolls);
-
 }

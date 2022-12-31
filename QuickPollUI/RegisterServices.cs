@@ -1,7 +1,4 @@
 ﻿
-using QuickPollLibrary.Managers;
-using QuickPollLibrary.UnitOfWork;
-
 namespace QuickPollUI;
 
 public static class RegisterServices
@@ -9,7 +6,7 @@ public static class RegisterServices
     public static void ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAdB2C"));
+        .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAdB2C"));
         builder.Services.AddControllersWithViews()
             .AddMicrosoftIdentityUI();
 

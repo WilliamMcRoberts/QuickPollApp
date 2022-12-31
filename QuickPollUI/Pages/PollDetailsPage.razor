@@ -3,7 +3,6 @@
 @inject IPollManager _pollManager
 @inject NavigationManager _nav
 
-
 <div class="question-container">
     <h3 class="poll-question-text">@_poll?.Question</h3>
     <p class="vote-text">TOTAL VOTES : @_poll?.OptionsList.GetTotalVotes()</p>
@@ -92,26 +91,15 @@
 
     private async Task ConnectToPollHub()
     {
-         _pollHubConnection = new HubConnectionBuilder()
-                    .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
-                    .WithAutomaticReconnect()
-                    .Build();
+        _pollHubConnection = new HubConnectionBuilder()
+                   .WithUrl(_nav.ToAbsoluteUri("/pollhub"))
+                   .WithAutomaticReconnect()
+                   .Build();
 
         _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
         {
             _allPolls = allPolls;
             _poll = _allPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault();
-            InvokeAsync(StateHasChanged);
-        });
-
-        _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
-        {
-            var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
-            if (pollToUpdate is not null)
-            {
-                int index = _allPolls.IndexOf(pollToUpdate);
-                _allPolls[index] = poll;
-            }
             InvokeAsync(StateHasChanged);
         });
 
@@ -166,7 +154,6 @@
         font-weight: 900;
         text-shadow: 1px 2px 1px #000, 1px 2px 2px #000, 1px 2px 3px #000, 1px 2px 4px #000;
         letter-spacing: 1px;
-
     }
 
     .finished {
@@ -212,7 +199,6 @@
 
         .percent-text {
             margin-top: 1.5em;
-
         }
     }
 
