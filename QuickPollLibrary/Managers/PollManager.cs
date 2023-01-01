@@ -1,15 +1,18 @@
 ﻿
+using Microsoft.AspNetCore.SignalR;
+
 namespace QuickPollLibrary.Managers;
 
 public class PollManager : IPollManager
 {
     private readonly IHubContext<PollHub> _hubContext;
-
     private List<PollModel> _allPolls = new();
 
-    public PollManager(IHubContext<PollHub> hubContext) =>
+    public PollManager(IHubContext<PollHub> hubContext)
+    {
         _hubContext = hubContext;
-    
+    }
+
     public async Task AddPoll(PollModel poll)
     {
         _allPolls.Add(poll);

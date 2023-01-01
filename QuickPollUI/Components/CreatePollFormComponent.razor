@@ -1,5 +1,5 @@
 ﻿@inject IPollManager _pollManager
-@inject ILogger<CreatePollForm> _logger
+@inject ILogger<CreatePollFormComponent> _logger
 @implements IDisposable
 
 <div class="form-div">
@@ -142,7 +142,7 @@
             { "PollIdCopied", false }
         };
 
-        ModalWrapperComponent.ShowModal(mouseArgs, typeof(PollLinkInfo), ParameterArguments, false);
+        ModalWrapperComponent.ShowModal(mouseArgs, typeof(PollLinkInfoComponent), ParameterArguments, false);
     }
 
     public async Task HandleSubmit()

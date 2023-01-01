@@ -2,14 +2,16 @@
 @inject IUnitOfWork _unitOfWork
 @inject IPollManager _pollManager
 @inject NavigationManager _nav
+@implements IAsyncDisposable
 
 <div class="question-container">
     <h3 class="poll-question-text">@_poll?.Question</h3>
     <p class="vote-text">TOTAL VOTES : @_poll?.OptionsList.GetTotalVotes()</p>
 
-     <CountDownTimer Poll="@_poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
+     <CountDownTimerComponent Poll="@_poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
 
 </div>
+
 @foreach (var option in _poll?.OptionsList)
 {
     <div class="option-container">
@@ -32,6 +34,8 @@
     [Parameter]
     public string PollId { get; set; }
 
+    private int totalConnections;
+
     private PollModel _poll;
 
     private UserModel _loggedInUser;
@@ -43,10 +47,16 @@
     protected override async Task OnInitializedAsync()
     {
         _poll = await _pollManager.GetPollById(PollId);
+    }
 
-        await ConnectToPollHub();
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            _loggedInUser = await GetLoggedInUser();
 
-        _loggedInUser = await GetLoggedInUser();
+            await ConnectToPollHub();
+        }
     }
 
     private void VoteOrUndoVoteForOption(PollOptionModel pollOption) =>
@@ -103,7 +113,21 @@
             InvokeAsync(StateHasChanged);
         });
 
+        _pollHubConnection.On<int>("ReceiveCount", count =>
+        {
+            totalConnections = count;
+            InvokeAsync(StateHasChanged);
+        });
+
         await _pollHubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_pollHubConnection is not null)
+        {
+            await _pollHubConnection.DisposeAsync();
+        }
     }
 }
 

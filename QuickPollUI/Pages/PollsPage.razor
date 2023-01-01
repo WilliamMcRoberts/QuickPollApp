@@ -3,6 +3,7 @@
 @inject NavigationManager _nav
 @inject IPollManager _pollManager
 @inject IUnitOfWork _unitOfWork
+@implements IAsyncDisposable
 
 <CascadingValue Value="_loggedInUser">
 
@@ -13,12 +14,12 @@
         {
             case "All Polls": 
                 <div class="search-bar-container">
-                    <SearchBar AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
+                    <SearchBarComponent AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
                 </div>
-                <PollList PollsToDisplay="_pollsToDisplay" />
+                <PollListComponent PollsToDisplay="_pollsToDisplay" />
                 break;
             case "Create Poll":
-                <CreatePollForm HandleAdd="HandleAdd" />
+                <CreatePollFormComponent HandleAdd="HandleAdd" />
                 break;
         }
     </div>
@@ -27,6 +28,8 @@
 
 @code {
     private HubConnection _pollHubConnection;
+
+    private int totalConnections;
 
     private List<PollModel> _allPolls = new();
     private List<PollModel> _pollsToDisplay = new();
@@ -39,11 +42,14 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _loggedInUser = await GetLoggedInUser();
+        if(firstRender)
+        {
+            _loggedInUser = await GetLoggedInUser();
 
-        await ConnectToPollHubAndBraodcastAllPolls();
+            await ConnectToPollHubAndBraodcastAllPolls();
+        }
     }
 
     private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) => 
@@ -67,26 +73,30 @@
                             .WithAutomaticReconnect()
                             .Build();
 
-        _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
+        _pollHubConnection.On<string, List<PollModel>, int>("getAllPolls", (from, allPolls, connections) =>
         {
             _allPolls = allPolls;
             _pollsToDisplay = _allPolls;
+            totalConnections = connections;
             InvokeAsync(StateHasChanged);
         });
 
-        _pollHubConnection.On<string, PollModel>("getPoll", (from, poll) =>
+        _pollHubConnection.On<int>("ReceiveCount", count =>
         {
-            var pollToUpdate = _allPolls.Where(p => p.PollId == poll.PollId).FirstOrDefault();
-            if (pollToUpdate is not null)
-            {
-                int index = _allPolls.IndexOf(pollToUpdate);
-                _allPolls[index] = poll;
-            }
+            totalConnections = count;
             InvokeAsync(StateHasChanged);
         });
 
         await _pollHubConnection.StartAsync();
         await _pollManager.BroadcastAllPolls();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_pollHubConnection is not null)
+        {
+            await _pollHubConnection.DisposeAsync();
+        }
     }
 }
 

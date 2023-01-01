@@ -2,7 +2,7 @@
 
 <div class="card-container">
 
-    <HomeCard>
+    <HomeCardComponent>
         <FrontFace>
             <i class="fa-solid fa-square-poll-horizontal"></i>
             <h3>Explore All Polls</h3>
@@ -11,9 +11,9 @@
             <p> Create a poll or explore polls that have already been created, including active and finished polls.</p>
             <a class="nav-btn-card" @onclick="NavigateToPolls" type="button">Let's Go!</a>
         </BackFace>
-    </HomeCard>
+    </HomeCardComponent>
 
-    <HomeCard>
+    <HomeCardComponent>
         <FrontFace>
             <i class="fa-solid fa-magnifying-glass"></i>
             <h3>Find A Poll</h3>
@@ -25,9 +25,9 @@
             </div>
             <a @onclick="FindAPoll" class="nav-btn-card" type="button">Find Poll</a>
         </BackFace>
-    </HomeCard>
+    </HomeCardComponent>
 
-    <HomeCard>
+    <HomeCardComponent>
         <FrontFace>
             <i class="fa-solid fa-info"></i>
             <h3>Quick Poll Info</h3>
@@ -36,7 +36,7 @@
             <p>Info about Quick Poll including support links and contact info.</p>
             <a class="nav-btn-card" @onclick="NavigateToInfo" type="button">Take Me There</a>
         </BackFace>
-    </HomeCard>
+    </HomeCardComponent>
 
 </div>
 
@@ -80,5 +80,5 @@
 
     private void ShowLoginModal(MouseEventArgs mouseArgs) =>
         ModalWrapperComponent.ShowModal(
-            mouseArgs, typeof(Login), new Dictionary<string, object> {}, true);
+            mouseArgs, typeof(LoginComponent), new Dictionary<string, object> {}, true);
 }
