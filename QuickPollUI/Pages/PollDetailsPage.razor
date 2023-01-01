@@ -4,29 +4,35 @@
 @inject NavigationManager _nav
 @implements IAsyncDisposable
 
-<div class="question-container">
-    <h3 class="poll-question-text">@_poll?.Question</h3>
-    <p class="vote-text">TOTAL VOTES : @_poll?.OptionsList.GetTotalVotes()</p>
-
-     <CountDownTimerComponent Poll="@_poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
-
-</div>
-
-@foreach (var option in _poll?.OptionsList)
+@if (_poll is not null)
 {
-    <div class="option-container">
-        <Tooltip Text="@GetTooltipText(option)" BgColor="#f0f">
-            <div @onclick="(() => VoteOrUndoVoteForOption(option))" style="background:  @GetAnswerBackgroundColor(option);" class="answer col-lg-8">
-                <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
-                <span class="percent-block">
-                    <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(@option.PollOptionVotes != 1 ? "Votes" : "Vote") </div>
-                    <div class="percent-text" style="color: @GetPercentTextColor(option)"> @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))% </div>
-                </span>
-            </div>
-        </Tooltip>
-    </div>
-}
+    <div class="question-container">
+        <h3 class="poll-question-text">@_poll.Question</h3>
+        <p class="vote-text">TOTAL VOTES : @_poll.OptionsList.GetTotalVotes()</p>
 
+        <CountDownTimerComponent Poll="@_poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
+
+    </div>
+
+    @foreach (var option in _poll?.OptionsList)
+    {
+        <div class="option-container">
+            <Tooltip Text="@GetTooltipText(option)" BgColor="#f0f">
+                <div @onclick="(() => VoteOrUndoVoteForOption(option))" style="background:  @GetAnswerBackgroundColor(option);" class="answer col-lg-8">
+                    <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
+                    <span class="percent-block">
+                        <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(
+                    @option.PollOptionVotes != 1 ? "Votes" : "Vote"
+                    ) </div>
+                        <div class="percent-text" style="color: @GetPercentTextColor(option)"> @(
+                    option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes())
+                    )% </div>
+                    </span>
+                </div>
+            </Tooltip>
+        </div>
+    }
+}
 @code {
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }

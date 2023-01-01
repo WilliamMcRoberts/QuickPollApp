@@ -13,8 +13,9 @@ public class PollManager : IPollManager
         _hubContext = hubContext;
     }
 
-    public async Task AddPoll(PollModel poll)
+    public async Task AddPoll(PollModel poll, UserModel user)
     {
+        user.PollIds.Add(poll.PollId.ToString());
         _allPolls.Add(poll);
         await BroadcastAllPolls();
     }
@@ -27,6 +28,9 @@ public class PollManager : IPollManager
         var pollToRemove = _allPolls.FirstOrDefault(p => p.PollId == poll.PollId);
 
         if (pollToRemove is null) return;
+
+        if(loggedInUser.PollIds.Contains(poll.PollId.ToString()))
+            loggedInUser.PollIds.Remove(pollToRemove.PollId.ToString());
 
         _allPolls.Remove(pollToRemove);
 
@@ -69,7 +73,7 @@ public class PollManager : IPollManager
     public async Task VoteOrUndoVoteForOption(
         PollOptionModel pollOption, PollModel poll, UserModel loggedInUser)
     {
-        if (poll.IsComplete || !poll.HasStarted)
+        if (poll.IsComplete || !poll.HasStarted || loggedInUser is null)
             return;
 
         if (poll.UsersVoted.Contains(loggedInUser.UserId) &&

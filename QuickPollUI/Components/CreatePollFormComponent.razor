@@ -149,7 +149,7 @@
     {
         SetPollData();
 
-        await _pollManager.AddPoll(poll);
+        await _pollManager.AddPoll(poll, LoggedInUser);
 
         poll = new()
         {

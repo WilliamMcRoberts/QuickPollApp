@@ -16,4 +16,6 @@ public class UserModel
     public string ObjectIdentifier { get; set; }
 
     public string DisplayName { get; set; }
+
+    public List<string> PollIds { get; set; } = new();
 }

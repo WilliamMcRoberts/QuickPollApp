@@ -1,9 +1,7 @@
 ﻿@inject NavigationManager _nav
 
 <div class="login">
-    <li class="nav-item">
-        <a class="nav-btn" href="MicrosoftIdentity/Account/SignIn">Log In</a>
-    </li>
+    <a class="nav-btn" href="MicrosoftIdentity/Account/SignIn">Log In</a>
 </div>
 
 @code {
@@ -14,10 +12,6 @@
 }
 
 <style>
-
-     li {
-       list-style-type: none;
-     }
 
     .nav-btn {
         text-decoration: none;
@@ -39,6 +33,7 @@
     .login {
         margin: 1em auto;
         text-align: center;
+        border: 2px solid red;
     }
 
 </style>

@@ -6,17 +6,22 @@
 @implements IAsyncDisposable
 
 <CascadingValue Value="_loggedInUser">
-
+    
     <Tabs ActiveItem="@activeTab" Items="@tabs" HandleTabChange="HandleTabChange" />
 
     <div class="content-container">
         @switch (activeTab)
         {
             case "All Polls": 
+                <div class="user-created-checkbox-container">
+                    <label class="user-created-checkbox-label">My Polls Only</label>
+                    <input class="user-created-checkbox-input" type="checkbox" @bind="@userCreatedOnly" />
+                </div>
                 <div class="search-bar-container">
                     <SearchBarComponent AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
                 </div>
-                <PollListComponent PollsToDisplay="_pollsToDisplay" />
+                <PollListComponent PollsToDisplay="GetPollsToDisplay()" />
+                
                 break;
             case "Create Poll":
                 <CreatePollFormComponent HandleAdd="HandleAdd" />
@@ -30,6 +35,7 @@
     private HubConnection _pollHubConnection;
 
     private int totalConnections;
+    private bool userCreatedOnly;
 
     private List<PollModel> _allPolls = new();
     private List<PollModel> _pollsToDisplay = new();
@@ -52,12 +58,15 @@
         }
     }
 
-    private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) => 
+    private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) =>
         _pollsToDisplay = filteredPolls.ToList();
 
     private void HandleTabChange(string tab) => activeTab = tab;
 
     private void HandleAdd() => activeTab = "All Polls";
+
+    private List<PollModel> GetPollsToDisplay() =>
+        userCreatedOnly ? _pollsToDisplay.Where(p => _loggedInUser.PollIds.Contains(p.PollId.ToString())).ToList() : _pollsToDisplay;
 
     private async Task<UserModel> GetLoggedInUser()
     {
@@ -73,11 +82,10 @@
                             .WithAutomaticReconnect()
                             .Build();
 
-        _pollHubConnection.On<string, List<PollModel>, int>("getAllPolls", (from, allPolls, connections) =>
+        _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
         {
             _allPolls = allPolls;
             _pollsToDisplay = _allPolls;
-            totalConnections = connections;
             InvokeAsync(StateHasChanged);
         });
 
@@ -102,6 +110,28 @@
 
 <style>
 
+     .user-created-checkbox-input {
+        transform: scale(1.5);
+        margin: 0 .5em;
+        accent-color: #BF40BF;
+        width: auto;
+    }
+
+    .user-created-checkbox-container {
+        margin: 3em auto;
+        position: absolute;
+        left: 12.5%;
+        top: 12%;
+    }
+
+    .user-created-checkbox-label {
+        font-size: 1em;
+        margin: .5em .25em;
+        width: auto;
+        color: #aaa;
+        font-weight: 700;
+    }
+
     .content-container {
         padding: 0 1em;
     }
@@ -122,6 +152,22 @@
             right: auto;
             top: auto;
             margin-bottom: 2em;
+        }
+    }
+
+    @@media(max-width: 700px) {
+        .user-created-checkbox-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            margin: 0 auto;
+            left: auto;
+            top: auto;
+            margin-bottom: 2em;
+        }
+
+        .user-created-checkbox-input {
+            box-shadow: none;
         }
     }
 

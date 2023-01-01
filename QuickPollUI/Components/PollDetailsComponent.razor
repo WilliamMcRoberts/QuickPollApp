@@ -8,8 +8,8 @@
         <p>Total Votes: @Poll.OptionsList.GetTotalVotes()</p>
 
         <div class="timer-container">
-            <CountDownTimerSimple Poll="@Poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
-        </div>    
+            <CountDownTimerSimpleComponent Poll="@Poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
+        </div>
 
         @foreach (var option in Poll.OptionsList)
         {
@@ -148,9 +148,9 @@
     }
 
     .timer-container {
-        margin: 0 auto;
-        width: 70%;
-        text-align: center;
+        position: absolute;
+        bottom: -.5em;
+        right: .5em;
     }
 
     .option-votes {
@@ -183,7 +183,6 @@
         .percent-text {
             margin-top: .5em;
         }
-
     }
 
     @@media(max-width: 420px) {
@@ -194,9 +193,16 @@
         .percent-text {
             margin-top: 1.5em;
         }
-
     }
 
-    
+    @@media(max-width: 520px) {
+        .timer-container {
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            display: flex;
+            justify-content:center;
+        }
+    }
 
 </style>

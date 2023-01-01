@@ -4,27 +4,27 @@
     if (Poll.TimeLimit is not null && Poll.StartTime < DateTime.Now)
     {
             <div class="timer">
-                <p>Time Limit:</p>
+                <p class="time-unit">Time Limit:</p>
                 <p class="time-unit">@timeLimitDays.ToString("00") d</p>
-            <p class="time-unit">@timeLimitHours.ToString("00") h</p>
-            <p class="time-unit">@timeLimitMinutes.ToString("00") m</p>
-            <p class="time-unit">@timeLimitSeconds.ToString("00") s</p>
+                <p class="time-unit">@timeLimitHours.ToString("00") h</p>
+                <p class="time-unit">@timeLimitMinutes.ToString("00") m</p>
+                <p class="time-unit">@timeLimitSeconds.ToString("00") s</p>
             </div>
     }
     else if (Poll.TimeLimit is not null && Poll.StartTime > DateTime.Now)
     {
             <div class="timer">
-                <p>Starts In:</p>
-            <p class="time-unit">@startsInDays.ToString("00") d</p>
-            <p class="time-unit">@startsInHours.ToString("00") h</p>
-            <p class="time-unit">@startsInMinutes.ToString("00") m</p>
-            <p class="time-unit">@startsInSeconds.ToString("00") s</p>
+                <p class="time-unit">Starts In:</p>
+                <p class="time-unit">@startsInDays.ToString("00") d</p>
+                <p class="time-unit">@startsInHours.ToString("00") h</p>
+                <p class="time-unit">@startsInMinutes.ToString("00") m</p>
+                <p class="time-unit">@startsInSeconds.ToString("00") s</p>
             </div>
     }
     else
     {
-            <div class="timer">
-                <p>No Time Limit</p>
+        <div class="timer">
+            <p>No Time Limit</p>
         </div>
     }
 }
@@ -114,10 +114,15 @@ else
 
 <style>
 
+    .time-unit {
+        font-weight: 700;
+    }
+
     .timer {
         justify-content: space-evenly;
         display: flex;
-        text-align: center;
+        text-align: right;
+        width: 16em;
     }
 
 </style>

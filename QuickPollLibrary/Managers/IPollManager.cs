@@ -2,7 +2,7 @@
 {
     public interface IPollManager
     {
-        Task AddPoll(PollModel poll);
+        Task AddPoll(PollModel poll, UserModel user);
         Task BroadcastAllPolls();
         Task DeletePoll(PollModel poll, UserModel loggedInUser);
         Task<PollModel> GetPollById(string pollId);
