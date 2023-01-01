@@ -5,17 +5,17 @@ public class UserModel
 {
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
-    public string UserId { get; set; }
+    public string UserId { get; set; } = string.Empty;
 
-    public string FirstName { get; set; }
+    public string FirstName { get; set; } = string.Empty;
 
-    public string LastName { get; set; }
+    public string LastName { get; set; } = string.Empty;
 
-    public string EmailAddress { get; set; }
+    public string EmailAddress { get; set; } = string.Empty;
 
-    public string ObjectIdentifier { get; set; }
+    public string ObjectIdentifier { get; set; } = string.Empty;
 
-    public string DisplayName { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
 
-    public List<string> PollIds { get; set; } = new();
+    public List<Guid> PollIds { get; set; } = new();
 }

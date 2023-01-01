@@ -1,6 +1,4 @@
 ﻿
-using Microsoft.AspNetCore.SignalR;
-
 namespace QuickPollLibrary.Managers;
 
 public class PollManager : IPollManager
@@ -13,9 +11,8 @@ public class PollManager : IPollManager
         _hubContext = hubContext;
     }
 
-    public async Task AddPoll(PollModel poll, UserModel user)
+    public async Task AddPoll(PollModel poll)
     {
-        user.PollIds.Add(poll.PollId.ToString());
         _allPolls.Add(poll);
         await BroadcastAllPolls();
     }
@@ -29,8 +26,8 @@ public class PollManager : IPollManager
 
         if (pollToRemove is null) return;
 
-        if(loggedInUser.PollIds.Contains(poll.PollId.ToString()))
-            loggedInUser.PollIds.Remove(pollToRemove.PollId.ToString());
+        if (loggedInUser.PollIds.Contains(poll.PollId))
+            loggedInUser.PollIds.Remove(pollToRemove.PollId);
 
         _allPolls.Remove(pollToRemove);
 

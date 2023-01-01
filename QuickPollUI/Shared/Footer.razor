@@ -1,0 +1,48 @@
+﻿@inject NavigationManager _nav
+
+<footer>
+    <div class="copyright">
+        @("\u00a9") 2023 
+        <div @onclick="NavigateHome" class="logo-footer">Quick Poll</div>
+    </div>
+</footer>
+
+@code {
+    private void NavigateHome()
+    {
+
+        _nav.NavigateTo("/");
+    }
+}
+
+<style>
+    .logo-footer {
+        cursor: pointer;
+        font-family: 'Pacifico', cursive;
+        color: whitesmoke;
+        font-size: 1.25em;
+        margin: 0 1em;
+        text-shadow:  2px 0 10px #f0f,  -1px 0 10px #0ff,  2px 0 10px #f0f,  -1px 0 10px #0ff, 0 0 10px #fff, -1px 0 10px #f0f, 2px 0 10px #0ff;
+    }
+
+    footer {
+        width: fit-content;
+        margin: 0 auto;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .copyright {
+        color: #aaa;
+        font-size: 1em;
+        display: flex;
+        padding: 20px;
+        border-top: 1px solid #c5b9b9f7;
+    }
+
+    @@media(max-width: 320px) {
+        .copyright {
+            flex-direction: column;
+        }
+    }
+</style>

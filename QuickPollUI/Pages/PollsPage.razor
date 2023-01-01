@@ -66,7 +66,7 @@
     private void HandleAdd() => activeTab = "All Polls";
 
     private List<PollModel> GetPollsToDisplay() =>
-        userCreatedOnly ? _pollsToDisplay.Where(p => _loggedInUser.PollIds.Contains(p.PollId.ToString())).ToList() : _pollsToDisplay;
+        userCreatedOnly ? _pollsToDisplay.Where(p => _loggedInUser.PollIds.Contains(p.PollId)).ToList() : _pollsToDisplay;
 
     private async Task<UserModel> GetLoggedInUser()
     {
