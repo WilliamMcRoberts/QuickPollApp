@@ -1,15 +1,8 @@
 ﻿@inject NavigationManager _nav
 
 <div class="login">
-    <a class="nav-btn" href="MicrosoftIdentity/Account/SignIn">Log In</a>
+    <NavLink class="nav-btn" href="MicrosoftIdentity/Account/SignIn">Log In</NavLink>
 </div>
-
-@code {
-    private void StartLogin()
-    {
-        _nav.NavigateTo("/MicrosoftIdentity/Account/SignIn", true);
-    }
-}
 
 <style>
 
@@ -31,8 +24,9 @@
     }
 
     .login {
-        margin: 1em auto;
+        margin: 0 auto;
         text-align: center;
+        margin-top: 2em;
     }
 
 </style>

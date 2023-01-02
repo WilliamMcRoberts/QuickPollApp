@@ -9,7 +9,7 @@
         </FrontFace>
         <BackFace>
             <p class="card-text"> Create a poll or explore polls that have already been created, including active and finished polls.</p>
-            <a class="nav-btn-card" @onclick="NavigateToPolls" type="button">Let's Go!</a>
+            <NavLink class="nav-btn-card" @onclick="NavigateToPolls" type="button">Let's Go!</NavLink>
         </BackFace>
     </HomeCardComponent>
 
@@ -23,7 +23,7 @@
                 <p class="card-text"> Enter your poll id, then click "Find" to navigate to your poll.</p>
                 <input class="id-input" @bind="@pollId" @bind:event="oninput" />
             </div>
-            <a @onclick="FindAPoll" class="nav-btn-card" type="button">Find Poll</a>
+            <NavLink @onclick="FindAPoll" class="nav-btn-card" type="button">Find Poll</NavLink>
         </BackFace>
     </HomeCardComponent>
 
@@ -34,7 +34,7 @@
         </FrontFace>
         <BackFace>
             <p class="card-text">Info about Quick Poll including support links and contact info.</p>
-            <a class="nav-btn-card" @onclick="NavigateToInfo" type="button">Take Me There</a>
+            <NavLink class="nav-btn-card" @onclick="NavigateToInfo" type="button">Take Me There</NavLink>
         </BackFace>
     </HomeCardComponent>
 
@@ -53,7 +53,7 @@
     private string pollId;
 
     private void NavigateToInfo() =>
-        _nav.NavigateTo("/polls");
+        _nav.NavigateTo("/info");
     
 
     private void NavigateToPolls()

@@ -5,6 +5,8 @@
 @inject IUnitOfWork _unitOfWork
 @implements IAsyncDisposable
 
+<PageTitle>Polls</PageTitle>
+
 <CascadingValue Value="_loggedInUser">
     
     <Tabs ActiveItem="@activeTab" Items="@tabs" HandleTabChange="HandleTabChange" />
@@ -67,7 +69,7 @@
     
 
     private List<PollModel> GetPollsToDisplay() =>
-        userCreatedOnly ? _pollsToDisplay.Where(p => _loggedInUser.PollIds.Contains(p.PollId)).ToList() : _pollsToDisplay;
+        userCreatedOnly ? _pollsToDisplay.Where(p => _loggedInUser.PollIds.Contains(p.PollId.ToString())).ToList() : _pollsToDisplay;
 
     private async Task<UserModel> GetLoggedInUser()
     {

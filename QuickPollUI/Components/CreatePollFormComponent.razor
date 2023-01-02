@@ -91,6 +91,9 @@
 </div>
 
 @code {
+
+    // TODO - Validate question length and option length
+
     [Parameter]
     public EventCallback HandleAdd { get; set; }
 
@@ -198,9 +201,11 @@
             poll.OptionsList.Remove(pollOption);
     }
 
-    private void ResetBooleans() => (optionLengthBad, questionLengthBad, duplicateOptions) = (false, false, false);
+    private void ResetBooleans() => 
+        (optionLengthBad, questionLengthBad, duplicateOptions) = (false, false, false);
 
-    private void AddOption() => poll.OptionsList.Add(new PollOptionModel() { PollOptionId = Guid.NewGuid() });
+    private void AddOption() => 
+        poll.OptionsList.Add(new PollOptionModel() { PollOptionId = Guid.NewGuid() });
 
     public void Dispose() => ModalWrapperComponent.OnModalClosed -= modalClosed;
 }

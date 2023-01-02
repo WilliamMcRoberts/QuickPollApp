@@ -26,8 +26,8 @@ public class PollManager : IPollManager
 
         if (pollToRemove is null) return;
 
-        if (loggedInUser.PollIds.Contains(poll.PollId))
-            loggedInUser.PollIds.Remove(pollToRemove.PollId);
+        if (loggedInUser.PollIds.Contains(poll.PollId.ToString()))
+            loggedInUser.PollIds.Remove(pollToRemove.PollId.ToString());
 
         _allPolls.Remove(pollToRemove);
 

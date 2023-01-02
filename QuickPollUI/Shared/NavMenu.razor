@@ -6,12 +6,12 @@
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item">
-                    <a class="nav-btn" href="MicrosoftIdentity/Account/SignOut">Log Out</a>
+                    <NavLink class="nav-btn" href="MicrosoftIdentity/Account/SignOut">Log Out</NavLink>
                 </div>
             </Authorized>
             <NotAuthorized>
                 <div class="nav-item">
-                    <a class="nav-btn" href="MicrosoftIdentity/Account/SignIn">Log In</a>
+                    <NavLink class="nav-btn" href="MicrosoftIdentity/Account/SignIn">Log In</NavLink>
                 </div>
             </NotAuthorized>
         </AuthorizeView>
@@ -19,10 +19,7 @@
 </div>
 
 @code {
-    private void NavigateHome()
-    {
-        _nav.NavigateTo("/");
-    }
+    private void NavigateHome() => _nav.NavigateTo("/");
 }
 
 <style>

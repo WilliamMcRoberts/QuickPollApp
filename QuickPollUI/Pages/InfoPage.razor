@@ -1,0 +1,45 @@
+﻿@page "/info"
+
+<PageTitle>Info</PageTitle>
+
+
+<div class="accordion-container">
+    <InfoAccordionSectionComponent Collapsed="true" Value="What is Quick Poll?">
+        Quick Poll allows users to create a poll for their followers to vote on as quick and as seamlessly as possible.  After creating an account, just navigate to "Explore All Polls", click the tab "Create Poll", and then fill in the form.  You will be supplied with a poll id for your new poll and a poll link to share with your followers.
+    </InfoAccordionSectionComponent>
+
+    <InfoAccordionSectionComponent Collapsed="true" Value="Support">
+        Email Support: <span class="link-support">quickpollsupport@gmail.com</span>
+    </InfoAccordionSectionComponent>
+</div>
+
+
+
+<style>
+    .accordion-container {
+        margin: 2em auto;
+    }
+
+    .link-support {
+        cursor: pointer;
+        text-decoration: none;
+        background-image: linear-gradient(90deg, #BF40BF, #fff);
+        font-weight: 900;
+        background-size: 0% 3px;
+        background-repeat: no-repeat;
+        background-position: left bottom;
+        color: #BF40BF;
+        transition: 300ms ease;
+        text-shadow: 0 0 2.5px #000, 0 0 5px #000, 0 0 7.5px #000, 0 0 10px #000;
+        margin: 1em 1em;
+                padding-bottom: 3px;
+
+    }
+
+    .link-support:hover {
+        background-size: 100% 3px;
+            color: #BF40BF;
+                    padding-bottom: 3px;
+
+    }
+</style>
