@@ -49,15 +49,11 @@
     [CascadingParameter]
     public UserModel LoggedInUser { get; set; }
 
-    private async Task VoteOrUndoVoteForOption(PollOptionModel pollOption)
-    {
+    private async Task VoteOrUndoVoteForOption(PollOptionModel pollOption) =>
         await _pollManager.VoteOrUndoVoteForOption(pollOption, Poll, LoggedInUser);
-    }
 
-    private async Task DeletePoll(PollModel poll, UserModel loggedInUser)
-    {
+    private async Task DeletePoll(PollModel poll, UserModel loggedInUser) =>
         await _pollManager.DeletePoll(poll, loggedInUser);
-    }
 
     private string GetAnswerBackgroundColor(PollOptionModel option) =>
         Poll.OptionsList.IndexOf(option) % 2 == 0 ? "rgba(217, 27, 66, 0.2)" : "rgba(69, 196, 150, 0.2)";
@@ -68,14 +64,8 @@
     private string GetPercentClass(PollOptionModel option) =>
         Poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd";
 
-    private string GetTooltipText(PollOptionModel option)
-    {
-        return Poll.UsersVoted.Contains(LoggedInUser?.UserId) && option.PollOptionUsersVoted.Contains(LoggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}"
-                : Poll.UsersVoted.Contains(LoggedInUser?.UserId) ? "You've Already Voted"
-                : !Poll.HasStarted ? "Poll Has Not Started Yet"
-                : Poll.IsComplete ? "Poll Is Finished"
-                : $"Vote {option.PollOptionName}";
-    }
+    private string GetTooltipText(PollOptionModel option) =>
+        option.GetTooltipText(Poll, LoggedInUser);
 
     private void GoToPollDetailsPage(Guid pollId) =>
         _nav.NavigateTo($"/polls/{pollId}");

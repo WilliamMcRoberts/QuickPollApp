@@ -1,9 +1,10 @@
-﻿ 
-@if(!Poll.IsComplete)
-{
-    if(Poll.TimeLimit is not null && Poll.StartTime < DateTime.Now)
+﻿
+<div class="timer">
+
+    @if(!Poll.IsComplete)
     {
-        <div class="timer">
+        if(Poll.TimeLimit is not null && Poll.StartTime < DateTime.Now)
+        {
             <p class="time-text">TIME LEFT</p>
             <div class="times">
                 <p class="time-unit-day">  @timeLimitDays.ToString("00") </p>
@@ -14,11 +15,9 @@
                 <p class="divider">|</p>
                 <p class="time-unit-sec">  @timeLimitSeconds.ToString("00") </p>
             </div>
-        </div>
-    }
-    else if (Poll.TimeLimit is not null && Poll.StartTime > DateTime.Now)
-    {
-        <div class="timer">
+        }
+        else if (Poll.TimeLimit is not null && Poll.StartTime > DateTime.Now)
+        {
             <p class="time-text">STARTS IN</p>
             <div class="times">
                 <p class="time-unit-day">  @startsInDays.ToString("00") </p>
@@ -29,22 +28,19 @@
                 <p class="divider">|</p>
                 <p class="time-unit-sec">  @startsInSeconds.ToString("00") </p>
             </div>
-        </div>
+        }
+        else
+        {
+            <p class="clock-text">NO TIME LIMIT</p>
+        }
     }
+
     else
     {
-        <div class="timer">
-            <p class="clock-text">No Time Limit</p>
-        </div>
+        <p class="clock-text">POLL FINISHED</p>
     }
-}
 
-else
-{
-    <div class="timer">
-        <p class="clock-text">Poll Finished</p>
-    </div>
-}
+</div>
 
 @code {
     [Parameter]
@@ -125,7 +121,7 @@ else
     }
 
     .clock-text {
-        font-size: 1.5em;
+        font-size: 1em;
         font-weight: 700;
         margin-top: .35em;
     }

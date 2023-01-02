@@ -31,6 +31,7 @@
 
 </CascadingValue>
 
+
 @code {
     private HubConnection _pollHubConnection;
 
@@ -48,14 +49,12 @@
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(firstRender)
-        {
-            _loggedInUser = await GetLoggedInUser();
 
-            await ConnectToPollHubAndBraodcastAllPolls();
-        }
+    protected override async Task OnInitializedAsync()
+    {
+        _loggedInUser = await GetLoggedInUser();
+
+        await ConnectToPollHubAndBraodcastAllPolls();
     }
 
     private void HandleSearchInput(IEnumerable<PollModel> filteredPolls) =>
@@ -64,6 +63,8 @@
     private void HandleTabChange(string tab) => activeTab = tab;
 
     private void HandleAdd() => activeTab = "All Polls";
+
+    
 
     private List<PollModel> GetPollsToDisplay() =>
         userCreatedOnly ? _pollsToDisplay.Where(p => _loggedInUser.PollIds.Contains(p.PollId)).ToList() : _pollsToDisplay;

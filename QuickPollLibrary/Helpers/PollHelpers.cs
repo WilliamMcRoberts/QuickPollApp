@@ -16,4 +16,14 @@ public static class PollHelpers
 
         return total;
     }
+
+    public static string GetTooltipText(this PollOptionModel option, PollModel poll, UserModel loggedInUser)
+    {
+        return loggedInUser is null ? "You Must Login To Vote"
+                : poll.UsersVoted.Contains(loggedInUser?.UserId!) && option.PollOptionUsersVoted.Contains(loggedInUser?.UserId!) ? $"Undo Vote {option.PollOptionName}"
+                : poll.UsersVoted.Contains(loggedInUser?.UserId!) ? "You've Already Voted"
+                : !poll.HasStarted ? "Poll Has Not Started Yet"
+                : poll.IsComplete ? "Poll Is Finished"
+                : $"Vote {option.PollOptionName}";
+    }
 }

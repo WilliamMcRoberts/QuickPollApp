@@ -33,7 +33,9 @@
         </div>
     }
 }
+
 @code {
+
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
@@ -53,16 +55,10 @@
     protected override async Task OnInitializedAsync()
     {
         _poll = await _pollManager.GetPollById(PollId);
-    }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if(firstRender)
-        {
-            _loggedInUser = await GetLoggedInUser();
+        _loggedInUser = await GetLoggedInUser();
 
-            await ConnectToPollHub();
-        }
+        await ConnectToPollHub();
     }
 
     private void VoteOrUndoVoteForOption(PollOptionModel pollOption) =>
@@ -89,14 +85,8 @@
     private string GetPercentClass(PollOptionModel option) =>
         _poll.OptionsList.IndexOf(option) % 2 == 0 ? "percent-even" : "percent-odd";
 
-    private string GetTooltipText(PollOptionModel option)
-    {
-        return _poll.UsersVoted.Contains(_loggedInUser?.UserId) && option.PollOptionUsersVoted.Contains(_loggedInUser?.UserId) ? $"Undo Vote {option.PollOptionName}" 
-                : _poll.UsersVoted.Contains(_loggedInUser?.UserId) ? "You've Already Voted" 
-                : !_poll.HasStarted ? "Poll Has Not Started Yet" 
-                : _poll.IsComplete ? "Poll Is Finished" 
-                : $"Vote {option.PollOptionName}";
-    }
+    private string GetTooltipText(PollOptionModel option) =>
+        option.GetTooltipText(_poll, _loggedInUser);
 
     private async Task<UserModel> GetLoggedInUser()
     {

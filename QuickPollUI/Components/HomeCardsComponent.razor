@@ -8,7 +8,7 @@
             <h3>Explore All Polls</h3>
         </FrontFace>
         <BackFace>
-            <p> Create a poll or explore polls that have already been created, including active and finished polls.</p>
+            <p class="card-text"> Create a poll or explore polls that have already been created, including active and finished polls.</p>
             <a class="nav-btn-card" @onclick="NavigateToPolls" type="button">Let's Go!</a>
         </BackFace>
     </HomeCardComponent>
@@ -20,7 +20,7 @@
         </FrontFace>
         <BackFace>
             <div>
-                <p> Enter your poll id, then click "Find" to navigate to your poll.</p>
+                <p class="card-text"> Enter your poll id, then click "Find" to navigate to your poll.</p>
                 <input class="id-input" @bind="@pollId" @bind:event="oninput" />
             </div>
             <a @onclick="FindAPoll" class="nav-btn-card" type="button">Find Poll</a>
@@ -33,7 +33,7 @@
             <h3>Quick Poll Info</h3>
         </FrontFace>
         <BackFace>
-            <p>Info about Quick Poll including support links and contact info.</p>
+            <p class="card-text">Info about Quick Poll including support links and contact info.</p>
             <a class="nav-btn-card" @onclick="NavigateToInfo" type="button">Take Me There</a>
         </BackFace>
     </HomeCardComponent>
@@ -58,7 +58,7 @@
 
     private void NavigateToPolls()
     {
-        if (string.IsNullOrWhiteSpace(LoggedInUser.UserId))
+        if (string.IsNullOrWhiteSpace(LoggedInUser?.UserId))
         {
             ShowLoginModal(mouseArgs);
             return;
@@ -82,3 +82,9 @@
         ModalWrapperComponent.ShowModal(
             mouseArgs, typeof(LoginComponent), new Dictionary<string, object> {}, true);
 }
+
+<style>
+    .card-text {
+        font-weight: 700;
+    }
+</style>

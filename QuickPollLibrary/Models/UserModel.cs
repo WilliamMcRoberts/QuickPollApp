@@ -17,5 +17,5 @@ public class UserModel
 
     public string DisplayName { get; set; } = string.Empty;
 
-    public List<Guid> PollIds { get; set; } = new();
+    public List<string> PollIds { get; set; } = new();
 }
