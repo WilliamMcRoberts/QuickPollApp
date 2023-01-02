@@ -3,19 +3,19 @@
     <div class="title">
         @if (Collapsed)
         {
-             <span>➕</span>
+            <span>➕</span>
         }
         else
         {
-             <span>➖</span>
+            <span>➖</span>
         }
         @Title
     </div>
     @if (!string.IsNullOrEmpty(Value))
     {
-            <div class="value">
-                <h4><span class="badge badge-success">@Value</span></h4>
-            </div>
+        <div class="value">
+            <h4><span class="badge badge-success">@Value</span></h4>
+        </div>
     }
     @if (!Collapsed)
     {
@@ -40,6 +40,7 @@
 }
 
 <style>
+
 
     .collapsable {
         cursor: pointer;
@@ -67,13 +68,13 @@
     }
 
     @@media(max-width: 1000px) {
-            .collapsable {
+        .collapsable {
             width: 70%;
         }
     }
 
     @@media(max-width: 600px) {
-            .collapsable {
+        .collapsable {
             width: 90%;
         }
     }
