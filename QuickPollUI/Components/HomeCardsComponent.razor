@@ -46,7 +46,7 @@
     public UserModel LoggedInUser { get; set; }
 
     [CascadingParameter]
-    public ModalWrapper ModalWrapperComponent { get; set; }
+    public CascadingModalWrapper ModalWrapperComponent { get; set; }
 
     MouseEventArgs mouseArgs;
 
@@ -79,8 +79,7 @@
     }
 
     private void ShowLoginModal(MouseEventArgs mouseArgs) =>
-        ModalWrapperComponent.ShowModal(
-            mouseArgs, typeof(LoginComponent), new Dictionary<string, object> {}, true);
+        ModalWrapperComponent.ShowModal(mouseArgs, typeof(LoginComponent), new Dictionary<string, object> {}, true);
 }
 
 <style>

@@ -101,7 +101,7 @@
     public UserModel LoggedInUser { get; set; }
 
     [CascadingParameter]
-    public ModalWrapper ModalWrapperComponent { get; set; }
+    public CascadingModalWrapper ModalWrapperComponent { get; set; }
 
     bool optionLengthBad;
     bool questionLengthBad;
@@ -109,7 +109,7 @@
     bool startImmediately = true;
     bool noTimeLimit = true;
 
-    ModalWrapper.ModalClosed modalClosed;
+    CascadingModalWrapper.ModalClosed modalClosed;
 
     PollModel poll = new()
     {
@@ -124,7 +124,7 @@
 
     protected override void OnInitialized() 
     {
-        modalClosed = new ModalWrapper.ModalClosed(ModalWrapperComponent_ModalClosed);
+        modalClosed = new CascadingModalWrapper.ModalClosed(ModalWrapperComponent_ModalClosed);
 
         ModalWrapperComponent.OnModalClosed += modalClosed;
     }
