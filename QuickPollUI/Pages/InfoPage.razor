@@ -1,6 +1,15 @@
 ﻿@page "/info"
+@inject NavigationManager NavigationManager
 
-<PageTitle>Info</PageTitle>
+<PageTitle>Create A Poll</PageTitle>
+<HeadContent>
+    <meta name="description" content="Create a poll or explore polls" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="@(NavigationManager.BaseUri)sitemap.xml" />
+    <link rel="alternate" type="application/rss+xml" href="@(NavigationManager.BaseUri)atom.xml">
+    <link rel="canonical" href="@(NavigationManager.BaseUri)info" />
+
+
+</HeadContent>
 
 
 <div class="accordion-container">
