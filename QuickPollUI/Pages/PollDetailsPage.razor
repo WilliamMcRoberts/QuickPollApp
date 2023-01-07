@@ -23,12 +23,8 @@
                 <div @onclick="(() => VoteOrUndoVoteForOption(option))" style="background:  @GetAnswerBackgroundColor(option);" class="answer col-lg-8">
                     <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))%"></div>
                     <span class="percent-block">
-                        <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(
-                    @option.PollOptionVotes != 1 ? "Votes" : "Vote"
-                    ) </div>
-                        <div class="percent-text" style="color: @GetPercentTextColor(option)"> @(
-                    option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes())
-                    )% </div>
+                        <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(@option.PollOptionVotes != 1 ? "Votes" : "Vote") </div>
+                        <div class="percent-text" style="color: @GetPercentTextColor(option)"> @(option.PollOptionVotes.GetPercentage(_poll.OptionsList.GetTotalVotes()))% </div>
                     </span>
                 </div>
             </Tooltip>
@@ -167,7 +163,7 @@
 
     .option-text {
         font-weight: 700;
-        font-family: 'News Cycle', sans-serif;
+        font-family: 'Chakra Petch', sans-serif;
         color: #fff;
         text-shadow: 1px 2px 1px #000, 1px 2px 2px #000, 1px 2px 3px #000, 1px 2px 4px #000;
     }
@@ -196,6 +192,8 @@
     .poll-question-text {
         margin-bottom: 1em;
         font-family: 'Chakra Petch', sans-serif;
+        color: #fff;
+        text-shadow: 1px 2px 1px #000, 1px 2px 2px #000, 1px 2px 3px #000, 1px 2px 4px #000;
     }
 
     .question-container {

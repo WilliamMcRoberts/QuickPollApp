@@ -10,7 +10,7 @@
 
     <div class="form-field">
         <label>Question ❔</label>
-        <InputText class="form-control input" id="question" @bind-Value="@poll.Question" @oninput="@(e => {poll.Question = e.Value?.ToString()!;})" />
+        <InputText class="form-control input" @bind-Value="@poll.Question" @oninput="@(e => {poll.Question = e.Value?.ToString()!;})" />
         <ValidationMessage class="error" For="@(() => poll.Question)" />
 
    </div>
@@ -45,7 +45,7 @@
 
         <div class="time">
             <label> <span class="clock"> 🕰️ </span> Limit</label>
-            <select style="color: @(noTimeLimit ? "#aaa" : "#000")" class="form-control" @bind="poll.TimeLimit" disabled="@noTimeLimit"> 
+            <InputSelect class="form-control select" @bind-Value="poll.TimeLimit" disabled="@noTimeLimit"> 
                 <option value="@TimeSpan.FromMinutes(1)">1 min</option>
                 <option value="@TimeSpan.FromMinutes(5)">5 min</option>
                 <option value="@TimeSpan.FromMinutes(15)">15 min</option>
@@ -66,19 +66,19 @@
                 <option value="@TimeSpan.FromDays(5)">5 Days</option>
                 <option value="@TimeSpan.FromDays(6)">6 Days</option>
                 <option value="@TimeSpan.FromDays(7)">7 Days</option>
-            </select>
+            </InputSelect>
             <div class="checkbox-container">
                 <label class="checkbox-label">No Limit</label>
-                <input class="checkbox-input" type="checkbox" @bind="@noTimeLimit" />
+                <InputCheckbox class="checkbox-input" @bind-Value="@noTimeLimit" />
             </div>
         </div>
 
         <div class="time">
             <label>Start <span class="clock"> 🕰️ </span></label>
-            <input style="color: @(startImmediately ? "#aaa" : "#000")" disabled="@startImmediately" class="form-control start input" type="datetime-local" @bind="poll.StartTime" max="2023-07-01T00:00" />
+            <InputDate disabled="@startImmediately" class="form-control start input" @bind-Value="poll.StartTime" max="2023-07-01T00:00" />
             <div class="checkbox-container">
                 <label class="checkbox-label">Start Now</label>
-                <input class="checkbox-input" type="checkbox" @bind="@startImmediately"/>
+                <InputCheckbox class="checkbox-input" @bind-Value="@startImmediately"/>
             </div>
         </div>
 
@@ -202,6 +202,10 @@
 
 <style>
 
+    .select {
+        color: @(noTimeLimit ? "#aaa" : "#000");
+    }
+
     label {
         font-weight: 700;
     }
@@ -247,6 +251,7 @@
         font-size: .75em;
         height: 40px;
         padding-top: .5em;
+        color: @(startImmediately ? "#aaa" : "#000");
     }
 
     select {
