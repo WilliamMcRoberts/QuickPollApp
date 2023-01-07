@@ -3,15 +3,17 @@
 @inject IMongoUserData _userData
 @implements IDisposable
 
-<div class="form-div">
+<EditForm Model="poll" OnValidSubmit="ShowModal">
+    <ObjectGraphDataAnnotationsValidator />
 
     <div class="error" style="display: @( duplicateOptions ? "block" : "none");"> * Duplicate options are not allowed * </div>
 
     <div class="form-field">
         <label>Question ❔</label>
-        <input class="form-control input" id="question" @bind="@poll.Question" @bind:event="oninput"/>
-        <div class="error" style="display: @( string.IsNullOrWhiteSpace(poll.Question) && questionLengthBad ? "block" : "none");"> * Required * </div>
-    </div>
+        <InputText class="form-control input" id="question" @bind-Value="@poll.Question" @oninput="@(e => {poll.Question = e.Value?.ToString()!;})" />
+        <ValidationMessage class="error" For="@(() => poll.Question)" />
+
+   </div>
 
     <div class="option-btn-container">
         <Button 
@@ -25,7 +27,7 @@
     <div class="options">
         @foreach(var pollOption in poll.OptionsList)
         {
-            <div class="form-field">
+           <div class="form-field">
                 <div class="remove-option-btn-container">
                     <Button Disabled="@(poll.OptionsList.Count < 3)"
                         ClassType="remove"
@@ -34,9 +36,9 @@
                     </Button>
                 </div>
                 <label>Option #️ @(poll.OptionsList.IndexOf(pollOption) + 1) </label>
-                <input class="form-control input" @bind="poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName" @bind:event="oninput"/>
-                <div class="error" style="display: @(string.IsNullOrWhiteSpace(pollOption.PollOptionName) && optionLengthBad ? "block" : "none")">* Required *</div>
-            </div>
+                <InputText class="form-control input" @bind-Value="poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName" @oninput="@(e => {poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName = e.Value?.ToString()!;})" />
+                <ValidationMessage class="error" For="@(() => poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName)" />
+           </div>
         }
     </div>
     <div class="form-field time-field">
@@ -82,17 +84,10 @@
 
     </div>
 
-    <Button 
-        ClassType="secondary" 
-        UseMouseEventArgs="true" 
-        HandleClickWithMouseArgs="((mouseArgs) => ShowModal(mouseArgs))"> 
-        Create Poll 
-    </Button>
-</div>
+    <Button Type="submit" ClassType="secondary"> Create Poll </Button>
+</EditForm>
 
 @code {
-
-    // TODO - Validate question length and option length
 
     [Parameter]
     public EventCallback HandleAdd { get; set; }
@@ -103,8 +98,6 @@
     [CascadingParameter]
     public CascadingModalWrapper ModalWrapperComponent { get; set; }
 
-    bool optionLengthBad;
-    bool questionLengthBad;
     bool duplicateOptions;
     bool startImmediately = true;
     bool noTimeLimit = true;
@@ -122,6 +115,8 @@
         TimeLimit = TimeSpan.FromSeconds(0)
     };
 
+    MouseEventArgs mouseArgs;
+
     protected override void OnInitialized() 
     {
         modalClosed = new CascadingModalWrapper.ModalClosed(ModalWrapperComponent_ModalClosed);
@@ -131,13 +126,13 @@
 
     public async void ModalWrapperComponent_ModalClosed() => await HandleSubmit();
 
-    public void ShowModal(MouseEventArgs mouseArgs)
+    public void ShowModal()
     {
-        ResetBooleans();
-
-        ValidatePollData();
-
-        if (questionLengthBad || optionLengthBad || duplicateOptions) return;
+        if (CheckForDuplicates())
+        {
+            duplicateOptions = true;
+            return;
+        }
 
         var ParameterArguments = new Dictionary<string, object>
         {
@@ -171,17 +166,15 @@
         await HandleAdd.InvokeAsync();
     }
 
-    private void ValidatePollData()
+    private bool CheckForDuplicates()
     {
-        if (string.IsNullOrWhiteSpace(poll.Question)) questionLengthBad = true;
-
         foreach(var pollOption in poll.OptionsList)
         {
             if (poll.OptionsList.Contains(poll.OptionsList.Where(po => po.PollOptionName == pollOption.PollOptionName
-                && po.PollOptionId != pollOption.PollOptionId).FirstOrDefault()!)) { duplicateOptions = true; }
-
-            if(string.IsNullOrWhiteSpace(pollOption.PollOptionName)) optionLengthBad = true;
+                && po.PollOptionId != pollOption.PollOptionId).FirstOrDefault()!)) return true;
         }
+
+        return false;
     }
 
     private void SetPollData()
@@ -200,9 +193,6 @@
         if (poll.OptionsList.Count > 2)
             poll.OptionsList.Remove(pollOption);
     }
-
-    private void ResetBooleans() => 
-        (optionLengthBad, questionLengthBad, duplicateOptions) = (false, false, false);
 
     private void AddOption() => 
         poll.OptionsList.Add(new PollOptionModel() { PollOptionId = Guid.NewGuid() });
@@ -280,11 +270,11 @@
     .error {
         color: #d91b42;
         font-weight: 700;
-        font-size: 12px;
+        font-size: 18px;
         margin-top: .25em;
     }
 
-    .form-div {
+    form {
         width: 70%;
         margin: 0 auto;
         text-align: center;

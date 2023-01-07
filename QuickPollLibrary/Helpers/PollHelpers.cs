@@ -1,5 +1,4 @@
 ﻿
-
 namespace QuickPollLibrary.Helpers;
 
 public static class PollHelpers
