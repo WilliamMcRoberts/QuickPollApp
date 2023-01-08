@@ -75,7 +75,7 @@
 
         <div class="time">
             <label>Start <span class="clock"> 🕰️ </span></label>
-            <InputDate disabled="@startImmediately" class="form-control start input" @bind-Value="poll.StartTime" max="2023-07-01T00:00" />
+            <InputDate Type="InputDateType.DateTimeLocal" disabled="@startImmediately" class="form-control start input" @bind-Value="poll.StartTime" max="2023-07-01T00:00" />
             <div class="checkbox-container">
                 <label class="checkbox-label">Start Now</label>
                 <InputCheckbox class="checkbox-input" @bind-Value="@startImmediately"/>
