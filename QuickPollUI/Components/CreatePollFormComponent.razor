@@ -10,7 +10,7 @@
 
     <div class="form-field">
         <label>Question ❔</label>
-        <InputText class="form-control input" @bind-Value="@poll.Question" @oninput="@(e => {poll.Question = e.Value?.ToString()!;})" />
+        <CustomInputText class="form-control input" @bind-Value="@poll.Question" />
         <ValidationMessage class="error" For="@(() => poll.Question)" />
    </div>
 
@@ -35,7 +35,7 @@
                     </Button>
                 </div>
                 <label>Option #️ @(poll.OptionsList.IndexOf(pollOption) + 1) </label>
-                <InputText class="form-control input" @bind-Value="poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName" @oninput="@(e => {poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName = e.Value?.ToString()!;})" />
+                <CustomInputText class="form-control input" @bind-Value="poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName" />
                 <ValidationMessage class="error" For="@(() => poll.OptionsList[poll.OptionsList.IndexOf(pollOption)].PollOptionName)" />
            </div>
         }
@@ -87,7 +87,6 @@
 </EditForm>
 
 @code {
-
     [Parameter]
     public EventCallback HandleAdd { get; set; }
 
