@@ -5,7 +5,13 @@
 @inject IMongoPollData _pollData
 @inject NavigationManager _nav
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Quick Poll - Home</PageTitle>
+<HeadContent>
+    <meta name="description" content="Home page for Quick Poll, choices for expoloring polls, searching for a poll, or viewing site info" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="@(_nav.BaseUri)sitemap.xml" />
+    <link rel="alternate" type="application/rss+xml" href="@(_nav.BaseUri)atom.xml">
+    <link rel="canonical" href="@(_nav.BaseUri)info" />
+</HeadContent>
 
 <CascadingValue Value="_loggedInUser">  
 

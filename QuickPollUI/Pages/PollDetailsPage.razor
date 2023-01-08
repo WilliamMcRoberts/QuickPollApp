@@ -4,7 +4,13 @@
 @inject NavigationManager _nav
 @implements IAsyncDisposable
 
-<PageTitle>Poll Details</PageTitle>
+<PageTitle>Quick Poll - Poll details</PageTitle>
+<HeadContent>
+    <meta name="description" content="Details page for poll @PollId, provides real-time info on the state of the poll" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="@(_nav.BaseUri)sitemap.xml" />
+    <link rel="alternate" type="application/rss+xml" href="@(_nav.BaseUri)atom.xml">
+    <link rel="canonical" href="@(_nav.BaseUri)info" />
+</HeadContent>
 
 @if (_poll is not null)
 {

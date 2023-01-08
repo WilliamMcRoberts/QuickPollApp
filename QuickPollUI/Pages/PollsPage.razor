@@ -6,6 +6,13 @@
 @implements IAsyncDisposable
 
 <PageTitle>Polls</PageTitle>
+<PageTitle>Quick Poll - Explore polls</PageTitle>
+<HeadContent>
+    <meta name="description" content="Polls page for Quick Poll, explore polls or create a poll" />
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="@(_nav.BaseUri)sitemap.xml" />
+    <link rel="alternate" type="application/rss+xml" href="@(_nav.BaseUri)atom.xml">
+    <link rel="canonical" href="@(_nav.BaseUri)info" />
+</HeadContent>
 
 <CascadingValue Value="_loggedInUser">
     
