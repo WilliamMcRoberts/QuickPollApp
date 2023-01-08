@@ -12,7 +12,6 @@
         <label>Question ❔</label>
         <InputText class="form-control input" @bind-Value="@poll.Question" @oninput="@(e => {poll.Question = e.Value?.ToString()!;})" />
         <ValidationMessage class="error" For="@(() => poll.Question)" />
-
    </div>
 
     <div class="option-btn-container">
@@ -195,7 +194,7 @@
     }
 
     private void AddOption() => 
-        poll.OptionsList.Add(new PollOptionModel() { PollOptionId = Guid.NewGuid() });
+        poll.OptionsList.Add(new PollOptionModel());
 
     public void Dispose() => ModalWrapperComponent.OnModalClosed -= modalClosed;
 }

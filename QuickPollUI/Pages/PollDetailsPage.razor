@@ -90,7 +90,7 @@
     {
         var authState = await AuthenticationStateTask;
         string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        return await _unitOfWork.Users.GetOneAsync(u => u.ObjectIdentifier == objectId);
+        return await _unitOfWork.Users.GetCurrentUserFromAuthentication(objectId);
     }
 
     private async Task ConnectToPollHub()

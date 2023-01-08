@@ -29,7 +29,7 @@
     {
         var authState = await AuthenticationStateTask;
         string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
-        _loggedInUser = await _unitOfWork.Users.GetOneAsync(u => u.ObjectIdentifier == objectId) ?? new();
+        _loggedInUser = await _unitOfWork.Users.GetCurrentUserFromAuthentication(objectId) ?? new();
 
 
         if (string.IsNullOrWhiteSpace(objectId)) return;
@@ -58,7 +58,7 @@
             isDirty = true;
             _loggedInUser.LastName = lastName;
         }
-        displayName = "FockinNewDisplayNameFockin";
+
         if (!displayName.Equals(_loggedInUser.DisplayName))
         {
             isDirty = true;
