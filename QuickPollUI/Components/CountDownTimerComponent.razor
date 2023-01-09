@@ -1,4 +1,4 @@
-﻿
+﻿@implements IDisposable
 <div class="timer">
 
     @if(!Poll.IsComplete)
@@ -113,6 +113,12 @@
         }
 
         InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        _timeLimitTimer.Elapsed -= new ElapsedEventHandler(CountDownTimeLimit);
+        _startsInTimer.Elapsed -= new ElapsedEventHandler(CountDownStartsIn);
     }
 }
 
