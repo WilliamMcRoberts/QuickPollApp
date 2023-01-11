@@ -114,8 +114,8 @@ else
 
     public void Dispose()
     {
-        _timeLimitTimer.Elapsed -= new ElapsedEventHandler(CountDownTimeLimit);
-        _startsInTimer.Elapsed -= new ElapsedEventHandler(CountDownStartsIn);
+        _timeLimitTimer.Dispose();
+        _startsInTimer.Dispose();
     }
 }
 
