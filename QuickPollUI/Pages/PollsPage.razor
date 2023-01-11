@@ -42,6 +42,7 @@
 
 @code {
     private HubConnection _pollHubConnection;
+    private UserModel _loggedInUser;
 
     private int totalConnections;
     private bool userCreatedOnly;
@@ -51,8 +52,6 @@
 
     private string[] tabs = new string[2] { "All Polls", "Create Poll" };
     private string activeTab = "All Polls";
-
-    private UserModel _loggedInUser;
 
     [CascadingParameter]
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }

@@ -58,22 +58,20 @@ else
 
     private DateTime? timeFinished => Poll.TimeLimit is not null ? Poll.StartTime + Poll.TimeLimit : null;
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            _timeLimitTimer.Elapsed += new ElapsedEventHandler(CountDownTimeLimit);
-            _startsInTimer.Elapsed += new ElapsedEventHandler(CountDownStartsIn);
+        _timeLimitTimer.Elapsed += new ElapsedEventHandler(CountDownTimeLimit);
+        _startsInTimer.Elapsed += new ElapsedEventHandler(CountDownStartsIn);
 
-            if (Poll.StartTime < DateTime.Now)
-            {
-                Poll.HasStarted = true;
-                _timeLimitTimer.Start();
-                PollHasStarted.InvokeAsync();
-            }
-            else if (Poll.StartTime > DateTime.Now)
-                _startsInTimer.Start();
+        if (Poll.StartTime < DateTime.Now)
+        {
+            Poll.HasStarted = true;
+            _timeLimitTimer.Start();
+            await PollHasStarted.InvokeAsync();
         }
+        else if (Poll.StartTime > DateTime.Now)
+            _startsInTimer.Start();
+        await base.OnInitializedAsync();
     }
 
     private void CountDownTimeLimit(object source, ElapsedEventArgs elapsedEventArgs)
