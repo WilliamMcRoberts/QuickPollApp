@@ -24,13 +24,12 @@
             case "All Polls": 
                 <div class="user-created-checkbox-container">
                     <label class="user-created-checkbox-label">My Polls Only</label>
-                    <input class="user-created-checkbox-input" type="checkbox" @bind="@userCreatedOnly" />
+                    <InputCheckbox class="user-created-checkbox-input" @bind-Value="@userCreatedOnly" />
                 </div>
                 <div class="search-bar-container">
                     <SearchBarComponent AllPolls="_allPolls" HandleSearchInput="HandleSearchInput" />
                 </div>
                 <PollListComponent PollsToDisplay="GetPollsToDisplay()" />
-                
                 break;
             case "Create Poll":
                 <CreatePollFormComponent HandleAdd="HandleAdd" />
@@ -71,8 +70,6 @@
 
     private void HandleAdd() => activeTab = "All Polls";
 
-    
-
     private List<PollModel> GetPollsToDisplay() =>
         userCreatedOnly ? _pollsToDisplay.Where(p => _loggedInUser.PollIds.Contains(p.PollId.ToString())).ToList() : _pollsToDisplay;
 
@@ -94,6 +91,13 @@
         {
             _allPolls = allPolls;
             _pollsToDisplay = _allPolls;
+            InvokeAsync(StateHasChanged);
+        });
+
+        _pollHubConnection.On<PollModel>("getPoll", poll =>
+        {
+            var pollToUpdate = _allPolls.FirstOrDefault(p => p.PollId == poll.PollId);
+            _allPolls[_allPolls.IndexOf(pollToUpdate)] = poll;
             InvokeAsync(StateHasChanged);
         });
 

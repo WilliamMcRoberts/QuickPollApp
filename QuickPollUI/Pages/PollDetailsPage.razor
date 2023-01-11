@@ -106,10 +106,9 @@
                    .WithAutomaticReconnect()
                    .Build();
 
-        _pollHubConnection.On<string, List<PollModel>>("getAllPolls", (from, allPolls) =>
+        _pollHubConnection.On<PollModel>("getPoll", poll =>
         {
-            _allPolls = allPolls;
-            _poll = _allPolls.Where(p => p.PollId.ToString() == PollId).FirstOrDefault();
+            _poll = poll;
             InvokeAsync(StateHasChanged);
         });
 

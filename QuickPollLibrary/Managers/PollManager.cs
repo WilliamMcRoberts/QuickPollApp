@@ -42,7 +42,7 @@ public class PollManager : IPollManager
 
         _allPolls[_allPolls.IndexOf(pollToUpdate)] = poll;
 
-        await BroadcastAllPolls();
+        await BroadcastPoll(poll);
     }
 
     public async Task Vote(PollOptionModel pollOption, PollModel poll, UserModel loggedInUser)
@@ -90,4 +90,7 @@ public class PollManager : IPollManager
 
     public async Task BroadcastAllPolls() =>
         await _hubContext.Clients.All.SendAsync(method: "getAllPolls", "PollService", _allPolls);
+
+    public async Task BroadcastPoll(PollModel pollToBroadcast) =>
+        await _hubContext.Clients.All.SendAsync(method: "getPoll", pollToBroadcast);
 }
