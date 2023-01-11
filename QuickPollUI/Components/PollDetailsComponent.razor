@@ -28,12 +28,14 @@
         @if(Poll.PollCreatorId == LoggedInUser.UserId)
         {
             <Button 
+                Type="button"
                 Disabled="@(Poll.PollCreatorId != LoggedInUser?.UserId)" 
                 HandleClick="(() => DeletePoll(Poll, LoggedInUser))">
                 Delete
             </Button>
         }
         <Button 
+            Type="button"
             HandleClick="(() => GoToPollDetailsPage(Poll.PollId))" 
             ClassType="secondary"> 
             Details 

@@ -16,6 +16,7 @@
 
     <div class="option-btn-container">
         <Button 
+            Type="button"
             ClassType="add-option" 
             HandleClick="AddOption">
             <span class="plus"> ➕ </span>
@@ -28,7 +29,9 @@
         {
            <div class="form-field">
                 <div class="remove-option-btn-container">
-                    <Button Disabled="@(poll.OptionsList.Count < 3)"
+                    <Button
+                        Type="button"
+                        Disabled="@(poll.OptionsList.Count < 3)"
                         ClassType="remove"
                         HandleClick="(() => RemoveOption(pollOption))">
                         ❌
@@ -83,7 +86,7 @@
 
     </div>
 
-    <Button Type="submit" ClassType="secondary"> Create Poll </Button>
+    <Button ClassType="secondary"> Create Poll </Button>
 </EditForm>
 
 @code {
