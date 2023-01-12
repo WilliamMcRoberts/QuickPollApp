@@ -4,12 +4,9 @@
     [CascadingParameter]
     public CascadingModalWrapper ModalWrapperComponent { get; set; }
 
-    MouseEventArgs mouseArgs;
-
     protected override void OnInitialized() =>
-        ShowLoginModal(mouseArgs);
+        ShowLoginModal();
 
-    private void ShowLoginModal(MouseEventArgs mouseArgs) =>
-        ModalWrapperComponent.ShowModal(
-            mouseArgs, typeof(LoginComponent), new Dictionary<string, object> { }, true);
+    private void ShowLoginModal() =>
+        ModalWrapperComponent.ShowModal(typeof(LoginComponent), new Dictionary<string, object> { }, true);
 }

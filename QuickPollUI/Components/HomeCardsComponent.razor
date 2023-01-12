@@ -48,8 +48,6 @@
     [CascadingParameter]
     public CascadingModalWrapper ModalWrapperComponent { get; set; }
 
-    MouseEventArgs mouseArgs;
-
     private string pollId;
 
     private void NavigateToInfo() =>
@@ -60,7 +58,7 @@
     {
         if (string.IsNullOrWhiteSpace(LoggedInUser?.UserId))
         {
-            ShowLoginModal(mouseArgs);
+            ShowLoginModal();
             return;
         }
 
@@ -71,15 +69,15 @@
     {
         if (string.IsNullOrWhiteSpace(LoggedInUser.UserId))
         {
-            ShowLoginModal(mouseArgs);
+            ShowLoginModal();
             return;
         }
 
         _nav.NavigateTo($"/polls/{pollId}");
     }
 
-    private void ShowLoginModal(MouseEventArgs mouseArgs) =>
-        ModalWrapperComponent.ShowModal(mouseArgs, typeof(LoginComponent), new Dictionary<string, object> {}, true);
+    private void ShowLoginModal() =>
+        ModalWrapperComponent.ShowModal(typeof(LoginComponent), new Dictionary<string, object> {}, true);
 }
 
 <style>

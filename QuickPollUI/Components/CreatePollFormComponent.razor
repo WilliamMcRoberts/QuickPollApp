@@ -116,8 +116,6 @@
         TimeLimit = TimeSpan.FromSeconds(0)
     };
 
-    MouseEventArgs mouseArgs;
-
     protected override void OnInitialized() 
     {
         modalClosed = new CascadingModalWrapper.ModalClosed(ModalWrapperComponent_ModalClosed);
@@ -142,7 +140,7 @@
             { "PollIdCopied", false }
         };
 
-        ModalWrapperComponent.ShowModal(mouseArgs, typeof(PollLinkInfoComponent), ParameterArguments, false);
+        ModalWrapperComponent.ShowModal(typeof(PollLinkInfoComponent), ParameterArguments, false);
     }
 
     public async Task HandleSubmit()
