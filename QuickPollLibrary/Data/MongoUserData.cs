@@ -24,7 +24,7 @@ public class MongoUserData : BaseData<UserModel>, IMongoUserData
         }
         var users = await _mongoDbConnection.UsersCollection.FindAsync(u => u.ObjectIdentifier == objectId);
         user = users.FirstOrDefault();
-        _memoryCache.Set("CurrentLoggedInUser", user, TimeSpan.FromMinutes(5));
+        _memoryCache.Set("CurrentLoggedInUser", user, TimeSpan.FromMinutes(15));
         return user;
     }
 }

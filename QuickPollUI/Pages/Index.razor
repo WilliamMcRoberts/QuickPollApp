@@ -1,6 +1,9 @@
 ﻿@page "/"
 @inject IUnitOfWork _unitOfWork
 @inject NavigationManager _nav
+@inject PersistentComponentState ApplicationState
+@implements IDisposable
+
 
 <PageTitle>Quick Poll - Home</PageTitle>
 <HeadContent>
@@ -21,11 +24,30 @@
     [CascadingParameter] 
     public Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
+    private PersistingComponentStateSubscription _subscription;
+
     private UserModel _loggedInUser;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadAndVerifyUser();
+        _subscription = ApplicationState.RegisterOnPersisting(PersistUser);
+
+        if (ApplicationState.TryTakeFromJson<UserModel>("userData", out var stored))
+            _loggedInUser = stored;
+        else
+            await LoadAndVerifyUser();
+
+    }
+
+    private Task PersistUser()
+    {
+        ApplicationState.PersistAsJson("userData", _loggedInUser);
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _subscription.Dispose();
     }
 
     private async Task LoadAndVerifyUser()
