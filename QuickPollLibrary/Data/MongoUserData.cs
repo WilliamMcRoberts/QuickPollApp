@@ -18,13 +18,17 @@ public class MongoUserData : BaseData<UserModel>, IMongoUserData
     public async Task<UserModel> GetCurrentUserFromAuthentication(string objectId)
     {
         var user = new UserModel();
-        if (_memoryCache.TryGetValue("CurrentLoggedInUser", out user))
-        {
-            return user!;
-        }
+
+        _memoryCache.TryGetValue("CurrentLoggedInUser", out user);
+
+        if (user is not null) return user;
+
         var users = await _mongoDbConnection.UsersCollection.FindAsync(u => u.ObjectIdentifier == objectId);
+
         user = users.FirstOrDefault();
+
         _memoryCache.Set("CurrentLoggedInUser", user, TimeSpan.FromMinutes(15));
+
         return user;
     }
 }

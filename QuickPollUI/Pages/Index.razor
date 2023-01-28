@@ -4,8 +4,8 @@
 @inject PersistentComponentState ApplicationState
 @implements IDisposable
 
-
 <PageTitle>Quick Poll - Home</PageTitle>
+
 <HeadContent>
     <meta name="description" content="Home page for Quick Poll, choices for expoloring polls, searching for a poll, or viewing site info" />
     <link rel="sitemap" type="application/xml" title="Sitemap" href="@(_nav.BaseUri)sitemap.xml" />
@@ -32,11 +32,8 @@
     {
         _subscription = ApplicationState.RegisterOnPersisting(PersistUser);
 
-        if (ApplicationState.TryTakeFromJson<UserModel>("userData", out var stored))
-            _loggedInUser = stored;
-        else
-            await LoadAndVerifyUser();
-
+        _loggedInUser = ApplicationState.TryTakeFromJson<UserModel>("userData", out var stored)
+            ? stored : await LoadAndVerifyUser();
     }
 
     private Task PersistUser()
@@ -50,14 +47,13 @@
         _subscription.Dispose();
     }
 
-    private async Task LoadAndVerifyUser()
+    private async Task<UserModel> LoadAndVerifyUser()
     {
         var authState = await AuthenticationStateTask;
         string objectId = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("objectidentifier"))?.Value;
         _loggedInUser = await _unitOfWork.Users.GetCurrentUserFromAuthentication(objectId) ?? new();
 
-
-        if (string.IsNullOrWhiteSpace(objectId)) return;
+        if (string.IsNullOrWhiteSpace(objectId)) return _loggedInUser;
 
         string firstName = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("givenname"))?.Value;
         string lastName = authState.User.Claims.FirstOrDefault(c => c.Type.Contains("surname"))?.Value;
@@ -101,10 +97,12 @@
             if (string.IsNullOrWhiteSpace(_loggedInUser.UserId))
             {
                 await _unitOfWork.Users.CreateOneAsync(_loggedInUser);
-                return;
+                return _loggedInUser;
             }
 
             await _unitOfWork.Users.ReplaceOneAsync(_loggedInUser.UserId, _loggedInUser, "UserId");
         }
+
+        return _loggedInUser;
     }
 }
