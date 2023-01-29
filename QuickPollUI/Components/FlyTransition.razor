@@ -1,0 +1,37 @@
+﻿
+<div class="con">
+    @FlyContent
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment FlyContent { get; set; }
+
+    [Parameter]
+    public int Duration { get; set; } = 500;
+
+    [Parameter]
+    public string Distance { get; set; } = "40";
+}
+
+<style>
+    .con {
+        animation: FLY @(Duration)ms 1;
+    }
+
+    .fly {
+        transform: translateY(0);
+        opacity: 1;
+        transition: @(Duration)ms ease;
+    }
+
+    .no-fly {
+        transform: translateY(@(Distance)px);
+        opacity: 0;
+    }
+
+    @@keyframes FLY {
+        0% {transform: translateY(@(Distance)px); opacity: 0;}
+        100% {transform: translateY(0); opacity: 1;}
+    }
+</style>

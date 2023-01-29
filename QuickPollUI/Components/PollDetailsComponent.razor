@@ -1,48 +1,54 @@
 ﻿@inject IPollManager _pollManager
 @inject IUnitOfWork _unitOfWork
 @inject NavigationManager _nav
+@inject IJSRuntime JSRuntime
 
-<Card>
-    <div class="poll">
-        <h3 class="question-text">@Poll.Question</h3>
-        <p>Total Votes: @Poll.OptionsList.GetTotalVotes()</p>
 
-        <div class="timer-container">
-            <CountDownTimerSimpleComponent Poll="@Poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
-        </div>
 
-        @foreach (var option in Poll.OptionsList)
-        {
-            <Tooltip Text="@GetTooltipText(option)" BgColor="#f0f">
-                <div @onclick="(() => VoteOrUndoVoteForOption(option))" style="background: @GetAnswerBackgroundColor(option);" class="answer">
-                    <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%"></div>
-                    <span class="percent-block">
-                        <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(option.PollOptionVotes != 1 ? "Votes" : "Vote")</div>
-                        <div class="percent-text" style="color: @GetPercentTextColor(option)">@(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%</div>
-                    </span>
+<FlyTransition Duration="1000" Distance="25">
+    <FlyContent>
+        <Card >
+            <div  class="poll">
+                <h3 class="question-text">@Poll.Question</h3>
+                <p>Total Votes: @Poll.OptionsList.GetTotalVotes()</p>
+
+                <div class="timer-container">
+                    <CountDownTimerSimpleComponent Poll="@Poll" PollComplete="HandlePollComplete" PollHasStarted="HandlePollHasStarted" />
                 </div>
-            </Tooltip>
-        }
-    </div>
-    <div class="delete-details">
-        @if(Poll.PollCreatorId == LoggedInUser.UserId)
-        {
-            <Button 
-                Type="button"
-                Disabled="@(Poll.PollCreatorId != LoggedInUser?.UserId)" 
-                HandleClick="(() => DeletePoll(Poll, LoggedInUser))">
-                Delete
-            </Button>
-        }
-        <Button 
-            Type="button"
-            HandleClick="(() => GoToPollDetailsPage(Poll.PollId))" 
-            ClassType="secondary"> 
-            Details 
-        </Button>
-    </div>
-    
-</Card>
+
+                @foreach (var option in Poll.OptionsList)
+                {
+                    <Tooltip Text="@GetTooltipText(option)" BgColor="#f0f">
+                        <div @onclick="(() => VoteOrUndoVoteForOption(option))" style="background: @GetAnswerBackgroundColor(option);" class="answer">
+                            <div class="percent @GetPercentClass(option)" style="width: @(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%"></div>
+                            <span class="percent-block">
+                                <div class="option-text"> @option.PollOptionName | @option.PollOptionVotes @(option.PollOptionVotes != 1 ? "Votes" : "Vote")</div>
+                                <div class="percent-text" style="color: @GetPercentTextColor(option)">@(option.PollOptionVotes.GetPercentage(Poll.OptionsList.GetTotalVotes()))%</div>
+                            </span>
+                        </div>
+                    </Tooltip>
+                }
+            </div>
+            <div class="delete-details">
+                @if(Poll.PollCreatorId == LoggedInUser.UserId)
+                {
+                    <Button 
+                        Type="button"
+                        Disabled="@(Poll.PollCreatorId != LoggedInUser?.UserId)" 
+                        HandleClick="(() => DeletePoll(Poll, LoggedInUser))">
+                        Delete
+                    </Button>
+                }
+                <Button 
+                    Type="button"
+                    HandleClick="(() => GoToPollDetailsPage(Poll.PollId))" 
+                    ClassType="secondary"> 
+                    Details 
+                </Button>
+            </div>
+        </Card>
+    </FlyContent>
+</FlyTransition>
 
 @code {
     [CascadingParameter]
