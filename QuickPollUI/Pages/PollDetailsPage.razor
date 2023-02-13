@@ -12,7 +12,8 @@
     <link rel="canonical" href="@(_nav.BaseUri)info" />
 </HeadContent>
 
-@if (_poll is not null)
+<FlyTransition Duration="1000" Distance="25">
+    @if (_poll is not null)
 {
     <div class="question-container">
         <h3 class="poll-question-text">@_poll.Question</h3>
@@ -37,7 +38,7 @@
         </div>
     }
 }
-
+</FlyTransition>
 @code {
 
     [CascadingParameter]

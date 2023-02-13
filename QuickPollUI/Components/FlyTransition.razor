@@ -1,11 +1,11 @@
 ﻿
 <div class="con">
-    @FlyContent
+    @ChildContent
 </div>
 
 @code {
     [Parameter]
-    public RenderFragment FlyContent { get; set; }
+    public RenderFragment @ChildContent { get; set; }
 
     [Parameter]
     public int Duration { get; set; } = 500;
@@ -35,3 +35,32 @@
         100% {transform: translateY(0); opacity: 1;}
     }
 </style>
+
+
+@************************************** JS Needed *******************************************@
+
+@*window.onscroll = () => {
+    checkCard();
+}
+
+function checkCard() {
+
+    const cons = document.querySelectorAll('.con')
+
+    const triggerBottom = window.innerHeight / 5 * 5
+
+    cons.forEach(con => {
+
+        const conTop = con.getBoundingClientRect().top
+
+        if (conTop < triggerBottom) {
+            con.classList.add('fly')
+            con.classList.remove('no-fly')
+            return
+        }
+        con.classList.remove('fly')
+        con.classList.add('no-fly')
+    })
+}*@
+
+@********************************************************************************************@
