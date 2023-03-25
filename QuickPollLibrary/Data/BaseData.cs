@@ -34,6 +34,7 @@ public class BaseData<T> : IBaseData<T> where T : class
         }
         catch (Exception ex)
         {
+            await Console.Out.WriteLineAsync("Error adding item");
         }
     }
 
