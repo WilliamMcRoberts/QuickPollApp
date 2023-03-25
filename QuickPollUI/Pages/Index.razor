@@ -2,6 +2,7 @@
 @inject IUnitOfWork _unitOfWork
 @inject NavigationManager _nav
 @inject PersistentComponentState ApplicationState
+@inject IMongoUserData _userData
 @implements IDisposable
 
 <PageTitle>Quick Poll - Home</PageTitle>
@@ -12,8 +13,6 @@
     <link rel="alternate" type="application/rss+xml" href="@(_nav.BaseUri)atom.xml">
     <link rel="canonical" href="@(_nav.BaseUri)info" />
 </HeadContent>
-
-
 
 <CascadingValue Value="_loggedInUser">  
 
@@ -30,12 +29,16 @@
 
     private UserModel _loggedInUser;
 
+    private List<UserModel> users = new();
+
     protected override async Task OnInitializedAsync()
     {
         _subscription = ApplicationState.RegisterOnPersisting(PersistUser);
 
         _loggedInUser = ApplicationState.TryTakeFromJson<UserModel>("userData", out var stored)
             ? stored : await LoadAndVerifyUser();
+
+        users = await _unitOfWork.Users.GetAllAsync();
     }
 
     private Task PersistUser()
@@ -99,10 +102,12 @@
             if (string.IsNullOrWhiteSpace(_loggedInUser.UserId))
             {
                 await _unitOfWork.Users.CreateOneAsync(_loggedInUser);
+                //await _userData.CreateOneAsync(_loggedInUser);
                 return _loggedInUser;
             }
 
             await _unitOfWork.Users.ReplaceOneAsync(_loggedInUser.UserId, _loggedInUser, "UserId");
+            //await _userData.ReplaceOneAsync(_loggedInUser.UserId, _loggedInUser, "UserId");
         }
 
         return _loggedInUser;

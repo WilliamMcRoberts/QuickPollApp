@@ -6,6 +6,7 @@ public class BaseData<T> : IBaseData<T> where T : class
     protected readonly string _collectionName;
     protected readonly IMongoCollection<T> _collection;
 
+
     public BaseData(IMongoDbConnection mongoDbConnection, string collectionName)
     {
         _collectionName = collectionName;
@@ -22,7 +23,6 @@ public class BaseData<T> : IBaseData<T> where T : class
     public async Task<T> GetOneAsync(Expression<Func<T, bool>> expression)
     {
         var results = await _collection.FindAsync(expression);
-
         return results.FirstOrDefault();
     }
 
@@ -50,7 +50,7 @@ public class BaseData<T> : IBaseData<T> where T : class
         await _collection.UpdateOneAsync(expression, update);
     }
 
-    public async Task DeletePollAsync(Expression<Func<T, bool>> expression)
+    public async Task DeleteOneAsync(Expression<Func<T, bool>> expression)
     {
         await _collection.DeleteOneAsync(expression);
     }

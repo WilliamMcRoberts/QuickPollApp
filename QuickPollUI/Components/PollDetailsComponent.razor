@@ -2,6 +2,7 @@
 @inject IUnitOfWork _unitOfWork
 @inject NavigationManager _nav
 @inject IJSRuntime JSRuntime
+@inject IMongoPollData _pollData
 
 
 
@@ -79,7 +80,8 @@
     private async Task HandlePollComplete()
     {
         Poll.IsComplete = true;
-        await _unitOfWork.Polls.CreateOneAsync(Poll);
+        await _pollData.CreateOneAsync(Poll);
+        //await _unitOfWork.Polls.CreateOneAsync(Poll);
         await _pollManager.UpdatePoll(Poll);
     }
 
