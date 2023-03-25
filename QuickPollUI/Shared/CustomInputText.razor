@@ -4,8 +4,7 @@
     @attributes="@AdditionalAttributes" 
     class="@CssClass" 
     @bind="@CurrentValueAsString" 
-    @bind:event="oninput" 
-    @bind:after="HandleBindAfter"
+    @oninput="@((e) => HandleBindAfter(e))"
     />
 
 
@@ -13,8 +12,9 @@
     [Parameter]
     public EventCallback BindAfter { get; set; }
 
-    public void HandleBindAfter()
+    public void HandleBindAfter(ChangeEventArgs e)
     {
+        CurrentValueAsString = e.Value.ToString();
         BindAfter.InvokeAsync();
     }
 }

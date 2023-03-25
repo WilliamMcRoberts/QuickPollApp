@@ -4,7 +4,7 @@ namespace QuickPollLibrary.Managers;
 public class PollManager : IPollManager
 {
     private readonly IHubContext<PollHub> _hubContext;
-    private List<PollModel> _allPolls = new();
+    public List<PollModel> _allPolls = new();
 
     public PollManager(IHubContext<PollHub> hubContext)
     {
@@ -45,6 +45,7 @@ public class PollManager : IPollManager
         await BroadcastPoll(poll);
     }
 
+    
     public async Task Vote(PollOptionModel pollOption, PollModel poll, UserModel loggedInUser)
     {
         poll.UsersVoted.Add(loggedInUser.UserId);
@@ -55,7 +56,7 @@ public class PollManager : IPollManager
 
         await UpdatePoll(poll);
     }
-
+    
     public async Task UndoVote(PollOptionModel pollOption, PollModel poll, UserModel loggedInUser)
     {
         poll.UsersVoted.Remove(loggedInUser.UserId);
