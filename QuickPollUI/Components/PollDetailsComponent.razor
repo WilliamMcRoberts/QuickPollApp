@@ -80,8 +80,8 @@
     private async Task HandlePollComplete()
     {
         Poll.IsComplete = true;
-        await _pollData.CreateOneAsync(Poll);
-        //await _unitOfWork.Polls.CreateOneAsync(Poll);
+        //await _pollData.CreateOneAsync(Poll);
+        await _unitOfWork.Polls.CreateOneAsync(Poll);
         await _pollManager.UpdatePoll(Poll);
     }
 
