@@ -1,19 +1,24 @@
-﻿
+﻿var prevScrollPos = window.pageYOffset;
+
 window.onscroll = () => {
     checkCard();
+//    getYOffset();
 }
+
+//function getYOffset() {
+//    const para = document.querySelector('.para');
+//    para.textContent = window.pageYOffset;
+//}
 
 function checkCard() {
 
     const cons = document.querySelectorAll('.con')
 
-    const triggerBottom = window.innerHeight / 5 * 5
+    const triggerBottom = window.innerHeight;
 
     cons.forEach(con => {
 
-        const conTop = con.getBoundingClientRect().top
-
-        if (conTop < triggerBottom) {
+        if (con.getBoundingClientRect().top < triggerBottom) {
             con.classList.add('fly')
             con.classList.remove('no-fly')
             return
