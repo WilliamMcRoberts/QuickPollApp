@@ -4,8 +4,6 @@
 @inject IJSRuntime JSRuntime
 @inject IMongoPollData _pollData
 
-
-
 <FlyTransition Duration="1000" Distance="25">
         <Card >
             <div  class="poll">
@@ -56,11 +54,19 @@
     [CascadingParameter]
     public UserModel LoggedInUser { get; set; }
 
-    private async Task VoteOrUndoVoteForOption(PollOptionModel pollOption) =>
-        await _pollManager.VoteOrUndoVoteForOption(pollOption, Poll, LoggedInUser);
+    private async Task VoteOrUndoVoteForOption(PollOptionModel pollOption)
+    {
+        
+     _pollManager.VoteOrUndoVoteForOption(pollOption, Poll, LoggedInUser);
+    await _pollManager.BroadcastPoll(Poll);
+    }
 
-    private async Task DeletePoll(PollModel poll, UserModel loggedInUser) =>
-        await _pollManager.DeletePoll(poll, loggedInUser);
+    private async Task DeletePoll(PollModel poll, UserModel loggedInUser)
+    {
+        _pollManager.DeletePoll(poll, loggedInUser);
+
+        await _pollManager.BroadcastAllPolls();
+    }
 
     private string GetAnswerBackgroundColor(PollOptionModel option) =>
         Poll.OptionsList.IndexOf(option) % 2 == 0 ? "rgba(217, 27, 66, 0.2)" : "rgba(69, 196, 150, 0.2)";
@@ -82,13 +88,16 @@
         Poll.IsComplete = true;
         //await _pollData.CreateOneAsync(Poll);
         await _unitOfWork.Polls.CreateOneAsync(Poll);
-        await _pollManager.UpdatePoll(Poll);
+         _pollManager.UpdatePoll(Poll);
+        await _pollManager.BroadcastPoll(Poll);
     }
 
     private async Task HandlePollHasStarted()
     {
         Poll.HasStarted = true;
-        await _pollManager.UpdatePoll(Poll);
+         _pollManager.UpdatePoll(Poll);
+
+        await _pollManager.BroadcastPoll(Poll);
     }
 }
 

@@ -66,19 +66,24 @@
         await ConnectToPollHub();
     }
 
-    private void VoteOrUndoVoteForOption(PollOptionModel pollOption) =>
+    private async Task VoteOrUndoVoteForOption(PollOptionModel pollOption)
+    {
         _pollManager.VoteOrUndoVoteForOption(pollOption, _poll, _loggedInUser);
+        await _pollManager.BroadcastPoll(_poll);
+    }
 
     private async Task HandlePollComplete()
     {
         _poll.IsComplete = true;
-        await _pollManager.UpdatePoll(_poll);
+        _pollManager.UpdatePoll(_poll);
+        await _pollManager.BroadcastPoll(_poll);
     }
 
     private async Task HandlePollHasStarted()
     {
         _poll.HasStarted = true;
-        await _pollManager.UpdatePoll(_poll);
+        _pollManager.UpdatePoll(_poll);
+        await _pollManager.BroadcastPoll(_poll);
     }
 
     private string GetAnswerBackgroundColor(PollOptionModel option) =>

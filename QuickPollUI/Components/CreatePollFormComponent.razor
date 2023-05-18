@@ -149,7 +149,8 @@
 
         LoggedInUser.PollIds.Add(poll.PollId.ToString());
         await _userData.ReplaceOneAsync(LoggedInUser.UserId, LoggedInUser, "UserId");
-        await _pollManager.AddPoll(poll);
+        _pollManager.AddPoll(poll);
+        await _pollManager.BroadcastAllPolls();
 
         poll = new()
         {
