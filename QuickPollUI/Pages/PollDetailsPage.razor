@@ -1,6 +1,6 @@
 ﻿@page "/polls/{PollId}"
 @inject IUnitOfWork _unitOfWork
-@inject IPollManager _pollManager
+@inject PollHub _pollHub
 @inject NavigationManager _nav
 @implements IAsyncDisposable
 
@@ -59,7 +59,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _poll = await _pollManager.GetPollById(PollId);
+        _poll =  _pollHub.GetPollById(PollId);
 
         _loggedInUser = await GetLoggedInUser();
 
@@ -68,22 +68,21 @@
 
     private async Task VoteOrUndoVoteForOption(PollOptionModel pollOption)
     {
-        _pollManager.VoteOrUndoVoteForOption(pollOption, _poll, _loggedInUser);
-        await _pollManager.BroadcastPoll(_poll);
+        _pollHub.VoteOrUndoVoteForOption(pollOption, _poll, _loggedInUser);
+        await _pollHub.BroadcastPoll(_poll);
     }
 
-    private async Task HandlePollComplete()
+    private void HandlePollComplete()
     {
         _poll.IsComplete = true;
-        _pollManager.UpdatePoll(_poll);
-        await _pollManager.BroadcastPoll(_poll);
+        _pollHub.UpdatePoll(_poll);
     }
 
-    private async Task HandlePollHasStarted()
+    private void HandlePollHasStarted()
     {
         _poll.HasStarted = true;
-        _pollManager.UpdatePoll(_poll);
-        await _pollManager.BroadcastPoll(_poll);
+        _pollHub.UpdatePoll(_poll);
+
     }
 
     private string GetAnswerBackgroundColor(PollOptionModel option) =>

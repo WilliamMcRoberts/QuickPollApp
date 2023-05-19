@@ -1,4 +1,4 @@
-﻿@inject IPollManager _pollManager
+﻿@inject PollHub _pollHub
 @inject IUnitOfWork _unitOfWork
 @inject NavigationManager _nav
 @inject IJSRuntime JSRuntime
@@ -54,18 +54,14 @@
     [CascadingParameter]
     public UserModel LoggedInUser { get; set; }
 
-    private async Task VoteOrUndoVoteForOption(PollOptionModel pollOption)
+    private void VoteOrUndoVoteForOption(PollOptionModel pollOption)
     {
-        
-     _pollManager.VoteOrUndoVoteForOption(pollOption, Poll, LoggedInUser);
-    await _pollManager.BroadcastPoll(Poll);
+        _pollHub.VoteOrUndoVoteForOption(pollOption, Poll, LoggedInUser);
     }
 
-    private async Task DeletePoll(PollModel poll, UserModel loggedInUser)
+    private void DeletePoll(PollModel poll, UserModel loggedInUser)
     {
-        _pollManager.DeletePoll(poll, loggedInUser);
-
-        await _pollManager.BroadcastAllPolls();
+        _pollHub.DeletePoll(poll, loggedInUser);
     }
 
     private string GetAnswerBackgroundColor(PollOptionModel option) =>
@@ -88,16 +84,14 @@
         Poll.IsComplete = true;
         //await _pollData.CreateOneAsync(Poll);
         await _unitOfWork.Polls.CreateOneAsync(Poll);
-         _pollManager.UpdatePoll(Poll);
-        await _pollManager.BroadcastPoll(Poll);
+        _pollHub.UpdatePoll(Poll);
+
     }
 
-    private async Task HandlePollHasStarted()
+    private void HandlePollHasStarted()
     {
         Poll.HasStarted = true;
-         _pollManager.UpdatePoll(Poll);
-
-        await _pollManager.BroadcastPoll(Poll);
+        _pollHub.UpdatePoll(Poll);
     }
 }
 

@@ -25,9 +25,8 @@ public static class RegisterServices
         builder.Services.AddSingleton<IMongoDbConnection, MongoDbConnection>();
         builder.Services.AddTransient<IMongoUserData, MongoUserData>();
         builder.Services.AddTransient<IMongoPollData, MongoPollData>();
-        builder.Services.AddSingleton<IPollManager, PollManager>();
+        builder.Services.AddSingleton<PollHub>();
         builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
-        builder.Services.AddSingleton<ICountManager, CountManager>();
         builder.Services.AddTransient(typeof(IBaseData<>), typeof(BaseData<>));
     }
 }

@@ -1,4 +1,4 @@
-﻿@inject IPollManager _pollManager
+﻿@inject PollHub _pollHub
 @inject ILogger<CreatePollFormComponent> _logger
 @inject IMongoUserData _userData
 @implements IDisposable
@@ -149,8 +149,7 @@
 
         LoggedInUser.PollIds.Add(poll.PollId.ToString());
         await _userData.ReplaceOneAsync(LoggedInUser.UserId, LoggedInUser, "UserId");
-        _pollManager.AddPoll(poll);
-        await _pollManager.BroadcastAllPolls();
+        _pollHub.AddPoll(poll);
 
         poll = new()
         {

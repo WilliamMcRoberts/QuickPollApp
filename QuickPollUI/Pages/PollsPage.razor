@@ -1,7 +1,7 @@
 ﻿@page "/polls"
 @attribute [Authorize]
 @inject NavigationManager _nav
-@inject IPollManager _pollManager
+@inject PollHub _pollHub
 @inject IUnitOfWork _unitOfWork
 @implements IAsyncDisposable
 
@@ -108,7 +108,7 @@
         });
 
         await _pollHubConnection.StartAsync();
-        await _pollManager.BroadcastAllPolls();
+        await _pollHub.BroadcastAllPolls();
     }
 
     public async ValueTask DisposeAsync()
