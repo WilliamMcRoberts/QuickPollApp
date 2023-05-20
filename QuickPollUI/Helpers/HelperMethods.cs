@@ -1,7 +1,8 @@
-﻿
-namespace QuickPollLibrary.Helpers;
+﻿using QuickPollLibrary.Models;
 
-public static class PollHelpers
+namespace QuickPollUI.Helpers;
+
+public static class HelperMethods
 {
     public static decimal GetPercentage(this int votes, int totalVotes)
     {

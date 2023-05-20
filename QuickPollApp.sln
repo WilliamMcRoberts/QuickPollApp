@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickPollUI", "QuickPollUI\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QuickPollLibrary", "QuickPollLibrary\QuickPollLibrary.csproj", "{62D18168-7A04-472D-8852-8E645C232DEA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickPollTests", "QuickPollTests\QuickPollTests.csproj", "{D9CF7527-6210-4F4D-A2C5-D5680F423258}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{62D18168-7A04-472D-8852-8E645C232DEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{62D18168-7A04-472D-8852-8E645C232DEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{62D18168-7A04-472D-8852-8E645C232DEA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D9CF7527-6210-4F4D-A2C5-D5680F423258}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9CF7527-6210-4F4D-A2C5-D5680F423258}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9CF7527-6210-4F4D-A2C5-D5680F423258}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9CF7527-6210-4F4D-A2C5-D5680F423258}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

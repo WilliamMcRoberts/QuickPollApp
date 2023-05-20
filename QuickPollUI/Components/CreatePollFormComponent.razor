@@ -85,7 +85,7 @@
         </div>
 
     </div>
-
+        
     <Button ClassType="secondary"> Create Poll </Button>
 </EditForm>
 
@@ -200,57 +200,8 @@
 }
 
 <style>
-
     .select {
         color: @(noTimeLimit ? "#aaa" : "#000");
-    }
-
-    label {
-        font-weight: 700;
-    }
-
-    .remove-option-btn-container {
-        position: absolute;
-        margin-top: .25em;
-    }
-
-    .plus {
-        margin: 0;
-        
-    }
-
-    .checkbox-input {
-        transform: scale(1.5);
-        margin: 0 .5em;
-        accent-color: #BF40BF;
-        width: auto;
-    }
-
-    .checkbox-container {
-        display: flex;
-        justify-content: center;
-    }
-
-    .checkbox-label {
-        font-size: .75em;
-        margin: .5em .25em;
-        width: auto;
-    }
-
-    option {
-        width: 70%;
-    }
-
-    .option-btn-container {
-        position:absolute;
-        right: 21%;
-    }
-
-    .start {
-        font-size: .75em;
-        height: 40px;
-        padding-top: .5em;
-        color: @(startImmediately ? "#aaa" : "#000");
     }
 
     select {
@@ -260,73 +211,119 @@
         height: 40px;
     }
 
-    .time {
-        width: 25%;
-        margin-bottom: 1em;
-    }
-
-    .time-field {
-        display: flex;
-        width: 90%;
-        justify-content: space-evenly;
-    }
-
-    .error {
-        color: #d91b42;
-        font-weight: 700;
-        font-size: 18px;
-        margin-top: .25em;
-    }
-
-    form {
-        width: 70%;
-        margin: 0 auto;
-        text-align: center;
-    }
-
-    .form-field {
-        margin: .5em auto;
-        color: #aaa;
-        font-size: 18px;
-        width: 100%;
-    }
-
-    .input {
-        width: 100%;
-        border-radius: 6px;
-        box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);
+    .start {
+        font-size: .75em;
+        height: 40px;
+        padding-top: .5em;
+        color: @(startImmediately ? "#aaa" : "#000");
     }
 
     label {
-        margin: 10px auto;
-        text-align: left;
+    font-weight: 700;
+}
+
+.remove-option-btn-container {
+    position: absolute;
+    margin-top: .25em;
+}
+
+.plus {
+    margin: 0;
+}
+
+.checkbox-input {
+    transform: scale(1.5);
+    margin: 0 .5em;
+    accent-color: #BF40BF;
+    width: auto;
+}
+
+.checkbox-container {
+    display: flex;
+    justify-content: center;
+}
+
+.checkbox-label {
+    font-size: .75em;
+    margin: .5em .25em;
+    width: auto;
+}
+
+option {
+    width: 70%;
+}
+
+.option-btn-container {
+    position: absolute;
+    right: 21%;
+}
+
+.time {
+    width: 25%;
+    margin-bottom: 1em;
+}
+
+.time-field {
+    display: flex;
+    width: 90%;
+    justify-content: space-evenly;
+}
+
+.error {
+    color: #d91b42;
+    font-weight: 700;
+    font-size: 18px;
+    margin-top: .25em;
+}
+
+form {
+    width: 70%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.form-field {
+    margin: .5em auto;
+    color: #aaa;
+    font-size: 18px;
+    width: 100%;
+}
+
+.input {
+    width: 100%;
+    border-radius: 6px;
+    box-shadow: 1px 2px 3px rgba(0, 0, 0, 0.8);
+}
+
+label {
+    margin: 10px auto;
+    text-align: left;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    width: 85%;
+    margin: 0 auto;
+}
+
+@@media(max-width: 600px) {
+    .form-div {
+        width: 100%;
     }
 
-    .options {
-        display: flex;
-        flex-direction: column;
-        width: 85%;
-        margin: 0 auto;
+    .option-btn-container {
+        right: 10%;
+    }
+}
+
+@@media(max-width: 410px) {
+    .clock {
+        display: none;
     }
 
-    @@media(max-width: 600px) {
-        .form-div {
-            width: 100%;
-        }
-
-        .option-btn-container {
-            right: 10%;
-        }
+    .option-btn-text {
+        display: none;
     }
-
-    @@media(max-width: 410px) {
-        .clock {
-            display: none;
-        }
-
-        .option-btn-text {
-            display: none;
-        }
-    }
-
+}
 </style>
